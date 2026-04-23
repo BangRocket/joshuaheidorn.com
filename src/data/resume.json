@@ -1,0 +1,39 @@
+{
+	"$schema": "./resume.schema.json",
+	"_placeholder": true,
+	"_note": "Replace placeholder values before publishing. This is a scaffolded starter.",
+	"name": "Joshua Heidorn",
+	"headline": "Software Engineer",
+	"summary": "One-paragraph pitch goes here. Edit src/data/resume.json to update.",
+	"contact": {
+		"email": "stairmaster401@gmail.com",
+		"location": "",
+		"links": [
+			{ "label": "GitHub", "url": "https://github.com/" },
+			{ "label": "LinkedIn", "url": "https://www.linkedin.com/" }
+		]
+	},
+	"experience": [
+		{
+			"company": "Placeholder Company",
+			"role": "Placeholder Role",
+			"start": "2020-01",
+			"end": "present",
+			"location": "",
+			"bullets": [
+				"Describe a responsibility or accomplishment here.",
+				"Another bullet. Keep these tight and outcome-focused."
+			],
+			"tags": ["placeholder"]
+		}
+	],
+	"education": [
+		{
+			"school": "Placeholder University",
+			"degree": "Placeholder Degree",
+			"start": "2014",
+			"end": "2018",
+			"location": ""
+		}
+	]
+}

@@ -1,0 +1,30 @@
+{
+	"_placeholder": true,
+	"_note": "Replace placeholder values before publishing.",
+	"categories": [
+		{
+			"name": "Languages",
+			"items": [
+				{ "name": "TypeScript" },
+				{ "name": "JavaScript" },
+				{ "name": "Python" }
+			]
+		},
+		{
+			"name": "Frameworks & Tools",
+			"items": [
+				{ "name": "React" },
+				{ "name": "Astro" },
+				{ "name": "Node.js" }
+			]
+		},
+		{
+			"name": "Infrastructure",
+			"items": [
+				{ "name": "Cloudflare Workers" },
+				{ "name": "Docker" },
+				{ "name": "PostgreSQL" }
+			]
+		}
+	]
+}
