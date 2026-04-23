@@ -1,0 +1,104 @@
+---
+import { getTerm, getEmDashCollection, getEntryTerms, decodeSlug } from "emdash";
+import Base from "../../../layouts/Base.astro";
+import ProjectCard from "../../../components/ProjectCard.astro";
+
+const slug = decodeSlug(Astro.params.slug);
+const term = slug ? await getTerm("tag", slug) : null;
+if (!term) return Astro.redirect("/404");
+
+const { entries: projects } = await getEmDashCollection("projects", {
+	where: { tag: term.slug },
+	orderBy: { published_at: "desc" },
+});
+
+const filtered = await Promise.all(
+	projects.map(async (project) => {
+		const tags = await getEntryTerms("projects", project.data.id, "tag");
+		return { project, tags: tags.map((t) => ({ slug: t.slug, label: t.label })) };
+	}),
+);
+---
+<Base
+	title={`Projects tagged "${term.label}"`}
+	description={`Projects tagged with ${term.label}`}
+>
+	<main class="projects-tag">
+		<header class="page-head">
+			<a href="/projects" class="back">← All projects</a>
+			<span class="eyebrow">Tag</span>
+			<h1>{term.label}</h1>
+			<p class="count">
+				{filtered.length} {filtered.length === 1 ? "project" : "projects"}
+			</p>
+		</header>
+
+		{filtered.length === 0 ? (
+			<p class="empty">No projects with this tag yet.</p>
+		) : (
+			<section class="grid">
+				{filtered.map(({ project, tags }) => (
+					<ProjectCard
+						title={project.data.title ?? "Untitled"}
+						summary={project.data.summary}
+						featuredImage={project.data.featured_image}
+						href={`/projects/${project.id}`}
+						tags={tags}
+						externalUrl={project.data.external_url}
+						sourceUrl={project.data.source_url}
+					/>
+				))}
+			</section>
+		)}
+	</main>
+</Base>
+
+<style>
+	.projects-tag {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 3.5rem 1.5rem 6rem;
+	}
+	.page-head {
+		margin-bottom: 3rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 2px solid var(--color-border);
+	}
+	.back {
+		font-family: var(--font-sans);
+		display: inline-block;
+		margin-bottom: 1rem;
+		color: var(--color-text);
+		text-decoration: none;
+		font-weight: 500;
+	}
+	.back:hover { color: var(--color-accent-hover); }
+	.eyebrow {
+		font-family: var(--font-sans);
+		font-size: 0.85rem;
+		color: var(--color-muted);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+	.page-head h1 {
+		font-family: var(--font-head);
+		font-size: clamp(2.25rem, 5vw, 3.5rem);
+		margin: 0.25rem 0 0;
+	}
+	.count {
+		font-family: var(--font-sans);
+		color: var(--color-muted);
+		margin: 0.5rem 0 0;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 2rem;
+	}
+	.empty {
+		padding: 3rem 0;
+		font-family: var(--font-sans);
+		color: var(--color-text-secondary);
+	}
+</style>
