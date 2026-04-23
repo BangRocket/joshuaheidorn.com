@@ -18,69 +18,222 @@
 
 ### Task 1: RetroUI + Astro compatibility spike (throwaway)
 
-**Purpose:** Before committing to the whole EmDash + RetroUI pairing, verify RetroUI's CLI works in an Astro+React project. If it fails, we adjust (fall back to manually copying component source from the RetroUI docs). This is a throwaway — spike lives in a scratch dir, not the main repo.
+**Purpose:** RetroUI's official install docs target Vite+React. Astro shares the Vite substrate but differs in project layout and React integration. Spike confirms the shadcn CLI can write RetroUI components into an Astro project and that they render correctly. Throwaway — lives in a scratch dir, not the main repo.
+
+**Reference docs** (pulled from https://github.com/Logging-Studio/RetroUI/blob/main/content/docs/install/vite.mdx on 2026-04-23):
+
+- Tailwind **v4** (not v3). Install: `pnpm add tailwindcss @tailwindcss/vite`. CSS: single `@import "tailwindcss";` line plus a `@theme { ... }` block with RetroUI's tokens.
+- Path alias: `@/*` → `./src/*` in `tsconfig.json` and whatever compiler config Astro generates.
+- Vite plugin: `@tailwindcss/vite` goes into Astro's `vite.plugins` array inside `astro.config.mjs`.
+- shadcn init: `npx shadcn@latest init` — answer prompts for config.
+- Component install: `npx shadcn@latest add 'https://retroui.dev/r/button.json'`. Components land at `@/components/retroui/Button` (note: `retroui/`, not `ui/`).
+- Fonts: Archivo Black (headings) + Space Grotesk (body), loaded via Google Fonts link or CSS `@import`.
+- Theme CSS (copy verbatim into `src/styles/global.css` or equivalent):
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --font-head: 'Archivo Black', sans-serif;
+  --font-sans: 'Space Grotesk', sans-serif;
+  --radius: var(--radius);
+  --shadow-xs: 1px 1px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--border);
+  --shadow: 3px 3px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 10px 10px 0 1px var(--border);
+  --shadow-2xl: 16px 16px 0 1px var(--border);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+}
+
+:root {
+  --radius: 0;
+  --background: #fff;
+  --foreground: #000;
+  --card: #fff;
+  --card-foreground: #000;
+  --primary: #ffdb33;
+  --primary-hover: #ffcc00;
+  --primary-foreground: #000;
+  --secondary: #000;
+  --secondary-foreground: #fff;
+  --muted: #aeaeae;
+  --muted-foreground: #5a5a5a;
+  --accent: #fae583;
+  --accent-foreground: #000;
+  --destructive: #e63946;
+  --destructive-foreground: #fff;
+  --border: #000;
+}
+
+.dark {
+  --radius: 0;
+  --background: #1a1a1a;
+  --foreground: #f5f5f5;
+  --card: #242424;
+  --card-foreground: #f5f5f5;
+  --primary: #ffdb33;
+  --primary-hover: #ffcc00;
+  --primary-foreground: #000;
+  --secondary: #3a3a3a;
+  --secondary-foreground: #f5f5f5;
+  --muted: #3f3f46;
+  --muted-foreground: #a0a0a0;
+  --accent: #fae583;
+  --accent-foreground: #000;
+  --destructive: #e63946;
+  --destructive-foreground: #fff;
+  --border: #3a3a3a;
+}
+```
 
 **Files:**
 - Create: `~/tmp/retroui-astro-spike/` (outside the project repo)
 
-**Step 1: Scaffold a minimal Astro+React project**
+**Step 1: Scaffold a minimal Astro+React+TS project**
 
 ```bash
-cd ~/tmp && pnpm create astro@latest retroui-astro-spike -- --template minimal --typescript strict --no-git --install
+cd ~/tmp
+pnpm create astro@latest retroui-astro-spike -- --template minimal --typescript strict --no-git --install
 cd retroui-astro-spike
 pnpm astro add react
-pnpm astro add tailwind
 ```
+
+Do NOT run `pnpm astro add tailwind` — that installs the v3 integration. We need v4 (see next step).
 
 Expected: Astro dev server starts with `pnpm dev` at `http://localhost:4321`.
 
-**Step 2: Open RetroUI docs in a browser and follow their current Vite-React install steps**
+**Step 2: Install Tailwind v4 + configure Vite plugin**
 
-The RetroUI docs site (https://www.retroui.dev/docs) does not render reliably via automated fetchers — **Joshua needs to open it in a browser** and follow the current install steps (they use a shadcn-style CLI that mutates config files).
+```bash
+pnpm add tailwindcss @tailwindcss/vite
+```
 
-**What to verify during the spike:**
-- Does the CLI accept an Astro project or error out?
-- Does it write to `src/components/ui/` or somewhere Astro-incompatible?
-- Does it modify `tsconfig.json` with aliases Astro understands?
-- Does the Tailwind config it generates match Astro's Tailwind integration (v3 vs v4)?
+Edit `astro.config.mjs`:
 
-**Step 3: Add a single RetroUI component (e.g. Button) to an Astro page**
+```js
+import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  integrations: [react()],
+  vite: { plugins: [tailwindcss()] },
+});
+```
+
+Create `src/styles/global.css` with the theme CSS from the reference block above.
+
+Import it in `src/pages/index.astro`:
 
 ```astro
 ---
-// src/pages/index.astro
-import { Button } from "../components/ui/button";
+import '../styles/global.css';
+---
+```
+
+**Step 3: Add path alias for `@/*`**
+
+Edit `tsconfig.json` — add `baseUrl` and `paths`:
+
+```json
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }
+  }
+}
+```
+
+**Step 4: Run shadcn init**
+
+```bash
+npx shadcn@latest init
+```
+
+**Unknown:** whether shadcn detects Astro, what it writes, whether it conflicts with our config. **This is the point of the spike.**
+
+Record everything the CLI does: any new files created, any existing files modified (especially `tsconfig.json`, `components.json`, any CSS file).
+
+**Step 5: Add RetroUI Button**
+
+```bash
+npx shadcn@latest add 'https://retroui.dev/r/button.json'
+```
+
+Expected: Component lands at `src/components/retroui/Button.tsx`. Verify by reading the file.
+
+**Step 6: Add Google Fonts + render the Button**
+
+In `src/pages/index.astro`:
+
+```astro
+---
+import '../styles/global.css';
+import { Button } from '@/components/retroui/Button';
 ---
 <html>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+  </head>
   <body>
-    <Button client:visible>Hello retro</Button>
+    <main style="padding:4rem">
+      <h1 style="font-family:var(--font-head)">Spike</h1>
+      <Button client:visible>Retro button</Button>
+    </main>
   </body>
 </html>
 ```
 
-Expected: Page renders, button is styled with RetroUI's NeoBrutalism look.
+```bash
+pnpm dev
+```
 
-**Step 4: Record findings**
+Visit `http://localhost:4321`. Expected: Button renders with yellow fill, black border, offset shadow, Archivo Black on heading.
 
-Write a short note (in this session's chat, not a file) covering:
-- Did RetroUI's CLI work in Astro? Yes/No/Partial.
-- Tailwind version needed (v3 or v4) — confirms which `@astrojs/tailwind` integration / `@tailwindcss/vite` plugin applies.
-- Any config files that needed manual fixup.
-- Any components that broke with `client:visible` vs `client:load`.
+**Step 7: Record findings**
 
-**Step 5: Decide path forward**
+Write findings inline in this session's chat (controller will pass them to downstream tasks). Cover at minimum:
 
-Based on findings:
-- **If CLI works cleanly:** proceed with Task 3's normal install flow.
-- **If CLI breaks:** fallback is to copy RetroUI component source from their docs by hand into `src/components/ui/` — slower, still works. Adjust Task 5 accordingly.
+1. Did `shadcn@latest init` run cleanly in Astro, or error?
+2. Did shadcn write a `components.json`? What did it contain?
+3. Did shadcn modify `tsconfig.json`, `astro.config.mjs`, or any CSS file?
+4. Did `shadcn add` land the component at `src/components/retroui/Button.tsx`?
+5. Did the button render with expected NeoBrutalism styling?
+6. Any hydration warnings in the browser console?
+7. Any quirks (e.g., did shadcn expect a `src/lib/utils.ts` file it couldn't find)?
 
-**Step 6: Tear down the spike**
+**Step 8: Decide path forward**
+
+- **Clean install:** document the exact command sequence; use it verbatim in Task 5.
+- **Broken:** fall back to hand-copying component source from RetroUI's GitHub (`components/retroui/` dir of their repo). Slower, still works.
+
+**Step 9: Tear down**
 
 ```bash
 rm -rf ~/tmp/retroui-astro-spike
 ```
 
-No commit. This task produces no code in the main repo, only learning.
+No commit to the main repo. This task produces learning, not code.
 
 ---
 
