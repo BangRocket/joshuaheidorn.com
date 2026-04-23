@@ -244,55 +244,73 @@ No commit to the main repo. This task produces learning, not code.
 **Files:**
 - Entire repo gets populated (it's currently empty except `CLAUDE.md` + `docs/plans/`)
 
-**Step 1: Check EmDash's current create command**
+**Context:** `create-emdash` is a fully interactive CLI (`@clack/prompts`) with no `--yes` or skip-prompt flags. We bypass it by downloading the template directly from `emdash-cms/templates` (the same place `create-emdash` fetches from via `giget`). The template we want is `blog-cloudflare`.
 
-Browse https://github.com/emdash-cms/emdash README for the current init command. As of 2026-04 it's:
-
-```bash
-yarn create emdash@latest
-```
-
-**Step 2: Run the scaffold into the project directory**
-
-Because the directory has files (`CLAUDE.md`, `docs/`, `.git/`), scaffolding in-place may error. Use a temp dir + move strategy:
+**Step 1: Download the `blog-cloudflare` template to a scratch dir**
 
 ```bash
 cd /tmp
-yarn create emdash@latest joshuaheidorn-scaffold
-# When prompted, pick the Blog template
-# Pick Cloudflare deploy target
-# Pick TypeScript
-cd joshuaheidorn-scaffold
-rsync -av --exclude='.git' --exclude='CLAUDE.md' --exclude='docs' ./ /Volumes/Storage/Code/joshuaheidorn.com/
-cd /Volumes/Storage/Code/joshuaheidorn.com
-rm -rf /tmp/joshuaheidorn-scaffold
+rm -rf emdash-blog-cloudflare
+npx giget@latest gh:emdash-cms/templates/blog-cloudflare emdash-blog-cloudflare
+# Fallback if giget misbehaves:
+# gh api repos/emdash-cms/templates/tarball/main | tar xz -C /tmp/emdash-template-tarball
+# mv /tmp/emdash-template-tarball/*/blog-cloudflare /tmp/emdash-blog-cloudflare
 ```
 
-Expected: Astro + EmDash files now live in the project repo alongside existing `CLAUDE.md` and `docs/`.
+Expected: `/tmp/emdash-blog-cloudflare/` populated with astro.config, package.json, wrangler.jsonc, src/, seed/, etc.
 
-**Step 3: Install deps**
+**Step 2: Rsync the template into the project repo, preserving local files**
 
 ```bash
+cd /tmp/emdash-blog-cloudflare
+rsync -av \
+  --exclude='.git' \
+  --exclude='CLAUDE.md' \
+  --exclude='.claude' \
+  --exclude='.agents' \
+  --exclude='AGENTS.md' \
+  ./ /Volumes/Storage/Code/joshuaheidorn.com/
+```
+
+Exclusions rationale: protect our existing `CLAUDE.md` and `docs/`, and drop the template's AI-assistant metadata we don't need.
+
+**Step 3: Clean up scratch dir**
+
+```bash
+rm -rf /tmp/emdash-blog-cloudflare
+```
+
+Expected: Repo now has Astro + EmDash scaffold files alongside our existing `CLAUDE.md` + `docs/plans/`.
+
+**Step 4: Install deps**
+
+```bash
+cd /Volumes/Storage/Code/joshuaheidorn.com
 yarn install
 ```
 
-Expected: Lockfile created, no errors.
+Expected: `yarn.lock` created, no errors. Note: the template's `package.json` has a `pnpm.onlyBuiltDependencies` block — yarn 1.x ignores it harmlessly.
 
-**Step 4: Verify dev server starts**
+**Step 5: Verify dev server starts**
 
 ```bash
 yarn dev
 ```
 
-Expected: Astro dev server starts, EmDash admin renders at `/admin` (or wherever EmDash's README says). Home page renders the default Blog template.
+Expected: Astro dev server starts at `http://localhost:4321`. The home page renders the default Blog template. Admin at `/admin` may error without D1/R2 bindings (that's Task 3) — check the README at the template's root for exact dev URL.
 
-**Step 5: Commit**
+Note `yarn bootstrap` is a script (`emdash init && emdash seed`) — **do not run yet**; it needs D1/R2 from Task 3.
+
+**Step 6: Commit**
 
 ```bash
-git add .gitignore package.json yarn-lock.yaml astro.config.* wrangler.jsonc src/ public/ tsconfig.json
-# Add any other top-level files the scaffold produced, individually — no `git add .`
-git status  # review what's staged
-git commit -m "scaffold EmDash blog template"
+cd /Volumes/Storage/Code/joshuaheidorn.com
+git status  # review
+git add .gitignore .prettierignore .prettierrc package.json yarn.lock astro.config.mjs wrangler.jsonc tsconfig.json emdash-env.d.ts worker-configuration.d.ts README.md
+git add src/ seed/
+# Add any other top-level files the scaffold produced, by name — no `git add .` per CLAUDE.md
+git status  # confirm nothing leaked
+git commit -m "scaffold emdash blog-cloudflare template"
 ```
 
 ---
