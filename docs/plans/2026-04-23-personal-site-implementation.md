@@ -6,11 +6,11 @@
 
 **Architecture:** Astro (SSR on Cloudflare Workers) runs EmDash CMS. `posts` and `projects` collections live in D1 (EmDash-managed). `resume.json` and `skills.json` live in `src/data/` and render at build time. RetroUI React components mount as Astro islands.
 
-**Tech Stack:** Astro, EmDash CMS, Cloudflare Workers + D1 + R2, Wrangler, React (islands only), Tailwind CSS, RetroUI, pnpm, TypeScript (EmDash) + JavaScript (app code where possible).
+**Tech Stack:** Astro, EmDash CMS, Cloudflare Workers + D1 + R2, Wrangler, React (islands only), Tailwind CSS, RetroUI, yarn, TypeScript (EmDash) + JavaScript (app code where possible).
 
 **Design doc:** `docs/plans/2026-04-23-personal-site-design.md` — read for decision rationale.
 
-**Testing posture:** No automated test runner at launch. Verification is manual: run `pnpm dev`, load the route in a browser, confirm expected output. Every task ends with a manual verification step and a commit.
+**Testing posture:** No automated test runner at launch. Verification is manual: run `yarn dev`, load the route in a browser, confirm expected output. Every task ends with a manual verification step and a commit.
 
 ---
 
@@ -22,7 +22,7 @@
 
 **Reference docs** (pulled from https://github.com/Logging-Studio/RetroUI/blob/main/content/docs/install/vite.mdx on 2026-04-23):
 
-- Tailwind **v4** (not v3). Install: `pnpm add tailwindcss @tailwindcss/vite`. CSS: single `@import "tailwindcss";` line plus a `@theme { ... }` block with RetroUI's tokens.
+- Tailwind **v4** (not v3). Install: `yarn add tailwindcss @tailwindcss/vite`. CSS: single `@import "tailwindcss";` line plus a `@theme { ... }` block with RetroUI's tokens.
 - Path alias: `@/*` → `./src/*` in `tsconfig.json` and whatever compiler config Astro generates.
 - Vite plugin: `@tailwindcss/vite` goes into Astro's `vite.plugins` array inside `astro.config.mjs`.
 - shadcn init: `npx shadcn@latest init` — answer prompts for config.
@@ -110,19 +110,19 @@
 
 ```bash
 cd ~/tmp
-pnpm create astro@latest retroui-astro-spike -- --template minimal --typescript strict --no-git --install
+yarn create astro@latest retroui-astro-spike -- --template minimal --typescript strict --no-git --install
 cd retroui-astro-spike
-pnpm astro add react
+yarn astro add react
 ```
 
-Do NOT run `pnpm astro add tailwind` — that installs the v3 integration. We need v4 (see next step).
+Do NOT run `yarn astro add tailwind` — that installs the v3 integration. We need v4 (see next step).
 
-Expected: Astro dev server starts with `pnpm dev` at `http://localhost:4321`.
+Expected: Astro dev server starts with `yarn dev` at `http://localhost:4321`.
 
 **Step 2: Install Tailwind v4 + configure Vite plugin**
 
 ```bash
-pnpm add tailwindcss @tailwindcss/vite
+yarn add tailwindcss @tailwindcss/vite
 ```
 
 Edit `astro.config.mjs`:
@@ -205,7 +205,7 @@ import { Button } from '@/components/retroui/Button';
 ```
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Visit `http://localhost:4321`. Expected: Button renders with yellow fill, black border, offset shadow, Archivo Black on heading.
@@ -249,7 +249,7 @@ No commit to the main repo. This task produces learning, not code.
 Browse https://github.com/emdash-cms/emdash README for the current init command. As of 2026-04 it's:
 
 ```bash
-pnpm create emdash@latest
+yarn create emdash@latest
 ```
 
 **Step 2: Run the scaffold into the project directory**
@@ -258,7 +258,7 @@ Because the directory has files (`CLAUDE.md`, `docs/`, `.git/`), scaffolding in-
 
 ```bash
 cd /tmp
-pnpm create emdash@latest joshuaheidorn-scaffold
+yarn create emdash@latest joshuaheidorn-scaffold
 # When prompted, pick the Blog template
 # Pick Cloudflare deploy target
 # Pick TypeScript
@@ -273,7 +273,7 @@ Expected: Astro + EmDash files now live in the project repo alongside existing `
 **Step 3: Install deps**
 
 ```bash
-pnpm install
+yarn install
 ```
 
 Expected: Lockfile created, no errors.
@@ -281,7 +281,7 @@ Expected: Lockfile created, no errors.
 **Step 4: Verify dev server starts**
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Expected: Astro dev server starts, EmDash admin renders at `/admin` (or wherever EmDash's README says). Home page renders the default Blog template.
@@ -289,7 +289,7 @@ Expected: Astro dev server starts, EmDash admin renders at `/admin` (or wherever
 **Step 5: Commit**
 
 ```bash
-git add .gitignore package.json pnpm-lock.yaml astro.config.* wrangler.jsonc src/ public/ tsconfig.json
+git add .gitignore package.json yarn-lock.yaml astro.config.* wrangler.jsonc src/ public/ tsconfig.json
 # Add any other top-level files the scaffold produced, individually — no `git add .`
 git status  # review what's staged
 git commit -m "scaffold EmDash blog template"
@@ -305,7 +305,7 @@ git commit -m "scaffold EmDash blog template"
 **Step 1: Log into Cloudflare via wrangler**
 
 ```bash
-pnpm wrangler login
+yarn wrangler login
 ```
 
 Expected: Browser auth flow, returns "logged in as <your-account>".
@@ -320,8 +320,8 @@ EmDash's scaffold should have populated it. Confirm:
 **Step 3: Create D1 database and R2 bucket if scaffold didn't**
 
 ```bash
-pnpm wrangler d1 create joshuaheidorn-content
-pnpm wrangler r2 bucket create joshuaheidorn-media
+yarn wrangler d1 create joshuaheidorn-content
+yarn wrangler r2 bucket create joshuaheidorn-media
 ```
 
 Paste the returned `database_id` into `wrangler.jsonc`. Paste the R2 bucket name into the appropriate binding.
@@ -331,7 +331,7 @@ Paste the returned `database_id` into `wrangler.jsonc`. Paste the R2 bucket name
 Per EmDash README — likely:
 
 ```bash
-pnpm wrangler d1 migrations apply joshuaheidorn-content --local
+yarn wrangler d1 migrations apply joshuaheidorn-content --local
 ```
 
 Expected: Migrations applied, schema tables created.
@@ -339,7 +339,7 @@ Expected: Migrations applied, schema tables created.
 **Step 5: Dev server smoke test**
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Visit `/admin`. Expected: Admin UI loads without DB errors.
@@ -370,11 +370,11 @@ Read `astro.config.*`. Note which integrations are already present.
 
 ```bash
 # Only if missing:
-pnpm astro add react
+yarn astro add react
 # Only if missing and Tailwind v3:
-pnpm astro add tailwind
+yarn astro add tailwind
 # If v4 (no @astrojs/tailwind integration exists):
-pnpm add -D tailwindcss @tailwindcss/vite
+yarn add -D tailwindcss @tailwindcss/vite
 # + add @tailwindcss/vite plugin to astro.config.mjs's `vite.plugins` array
 ```
 
@@ -383,7 +383,7 @@ Which Tailwind flavor to use is determined by Task 1's spike findings. Do not gu
 **Step 3: Verify config parses**
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Expected: No config errors, dev server starts.
@@ -391,7 +391,7 @@ Expected: No config errors, dev server starts.
 **Step 4: Commit**
 
 ```bash
-git add astro.config.* package.json pnpm-lock.yaml tailwind.config.* src/styles/app.css
+git add astro.config.* package.json yarn-lock.yaml tailwind.config.* src/styles/app.css
 git commit -m "add react + tailwind integrations"
 ```
 
@@ -400,35 +400,136 @@ git commit -m "add react + tailwind integrations"
 ### Task 5: Install RetroUI and smoke-test one component
 
 **Files:**
-- Create: `src/components/ui/*.tsx` (or `.jsx` — depends on RetroUI CLI output)
-- Possibly modify: `tsconfig.json` (path aliases), `tailwind.config.*`
+- Create: `src/components/retroui/Button.tsx` (RetroUI component — note path is `retroui/`, not `ui/`)
+- Create: `src/lib/utils.ts` (shadcn's `cn()` helper — auto-written by shadcn init)
+- Create: `components.json` (shadcn config — auto-written by shadcn init)
+- Modify/overwrite: `src/styles/global.css` (restore RetroUI theme after shadcn init clobbers it)
+- Modify: `tsconfig.json` (path alias `@/*` → `./src/*` if not already present)
+- Delete: `src/components/ui/button.tsx` (shadcn init drops a default Button we don't want)
 
-**Step 1: Follow RetroUI install per Task 1's spike findings**
+**Known issues from Task 1 spike (do not re-discover):**
 
-Open https://www.retroui.dev/docs in a browser. Run the current install steps.
+- **shadcn init overwrites `global.css`** with its Nova preset. Write your RetroUI theme CSS *after* `shadcn init` completes, not before.
+- **RetroUI components use runtime imports of types** (`import { VariantProps }` instead of `import { type VariantProps }`). Vite 7 strict ESM rejects these. Every added component needs the same two fixes. Write a helper script or do it inline.
+- **shadcn init prompts even with `--yes`**. Use explicit flags: `--template astro --base base --preset nova --yes --force`.
+- **shadcn init installs extra deps** (`@base-ui/react`, `@fontsource-variable/geist`, `tw-animate-css`). Fine to keep; not needed by RetroUI.
 
-**Step 2: Add one component (Button) as a smoke test**
+**Step 1: Add Tailwind v4 path alias to `tsconfig.json`**
 
-Either via their CLI or by hand-copying source. Confirm it lands in `src/components/ui/button.tsx`.
+Check the EmDash scaffold's `tsconfig.json`. It should already extend `astro/tsconfigs/strict`. Ensure `compilerOptions.baseUrl = "."` and `compilerOptions.paths = { "@/*": ["./src/*"] }`. Add them if missing.
 
-**Step 3: Mount it on the Blog template's home page**
+**Step 2: Ensure `@tailwindcss/vite` is configured**
 
-Pick an easy insertion point in the Blog template's layout (e.g., the header's "Home" link becomes a RetroUI Button).
-
-**Step 4: Dev server smoke test**
+If EmDash's Blog template uses Tailwind v3 / the `@astrojs/tailwind` integration, rip it out and install v4:
 
 ```bash
-pnpm dev
+yarn remove @astrojs/tailwind  # if present
+yarn add tailwindcss @tailwindcss/vite
 ```
 
-Visit `http://localhost:4321`. Expected: Button renders with retro styling. No hydration warnings in the console.
+Edit `astro.config.mjs` to add `tailwindcss()` to `vite.plugins`:
 
-**Step 5: Commit**
+```js
+import tailwindcss from '@tailwindcss/vite';
+// ...
+export default defineConfig({
+  // ... existing EmDash + React integrations
+  vite: { plugins: [tailwindcss()] },
+});
+```
+
+**Step 3: Run shadcn init with explicit flags**
 
 ```bash
-git add src/components/ui/ tsconfig.json tailwind.config.*
-git add <the blog layout file you modified>
-git commit -m "install retroui + smoke-test button component"
+npx shadcn@latest init --template astro --base base --preset nova --yes --force
+```
+
+Verify `components.json` was created and looks roughly like:
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "css": "src/styles/global.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
+}
+```
+
+**Step 4: Restore RetroUI theme CSS (shadcn init clobbered it)**
+
+Overwrite `src/styles/global.css` with the full RetroUI theme block from Task 1's reference section. This wipes out shadcn's neutral-base oklch palette and restores RetroUI's yellow NeoBrutalism palette.
+
+**Step 5: Remove the stray `src/components/ui/button.tsx`**
+
+```bash
+rm src/components/ui/button.tsx
+```
+
+**Step 6: Add RetroUI Button**
+
+```bash
+npx shadcn@latest add 'https://retroui.dev/r/button.json'
+```
+
+Expected landing path: `src/components/retroui/Button.tsx`.
+
+**Step 7: Fix the `type`-import bug**
+
+Edit `src/components/retroui/Button.tsx`:
+
+- `import { cva, VariantProps } from "class-variance-authority"` → `import { cva, type VariantProps } from "class-variance-authority"`
+- `import React, { ButtonHTMLAttributes } from "react"` → `import React, { type ButtonHTMLAttributes } from "react"`
+
+**Step 8: Ensure fonts load**
+
+In EmDash's root layout (Task 8 will redo this more thoroughly — for now just get fonts loading), add to `<head>`:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet" />
+```
+
+**Step 9: Mount Button somewhere visible**
+
+Pick an easy spot in the Blog template's layout. Add an import + element:
+
+```astro
+---
+import { Button } from '@/components/retroui/Button';
+---
+<Button client:visible>Retro test</Button>
+```
+
+**Step 10: Dev server smoke test**
+
+```bash
+yarn dev
+```
+
+Visit `http://localhost:4321` (or whatever port EmDash uses). Expected:
+- Button renders with yellow fill, black border, offset shadow
+- No hydration warnings in console
+- `font-head` class resolves (Archivo Black)
+
+**Step 11: Commit**
+
+```bash
+git add components.json src/lib/utils.ts src/components/retroui/Button.tsx src/styles/global.css tsconfig.json astro.config.mjs package.json yarn.lock
+git add <the layout file modified in Step 8>
+git commit -m "install retroui + smoke-test button"
 ```
 
 ---
@@ -455,18 +556,18 @@ Mirror the `posts` schema structure but with project-appropriate fields (title, 
 
 **Step 3: Generate + apply migration**
 
-Per EmDash's conventions (check their README — may be `pnpm emdash migrate` or `wrangler d1 migrations create`):
+Per EmDash's conventions (check their README — may be `yarn emdash migrate` or `wrangler d1 migrations create`):
 
 ```bash
-pnpm wrangler d1 migrations create joshuaheidorn-content add_projects
+yarn wrangler d1 migrations create joshuaheidorn-content add_projects
 # edit the SQL file
-pnpm wrangler d1 migrations apply joshuaheidorn-content --local
+yarn wrangler d1 migrations apply joshuaheidorn-content --local
 ```
 
 **Step 4: Verify in admin**
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Visit `/admin`. Expected: "Projects" appears as a content type. Create a test project, confirm it persists.
@@ -573,7 +674,7 @@ In `src/styles/app.css` or via `<link>` in the layout. Prefer self-hosting (avoi
 **Step 4: Dev server check**
 
 ```bash
-pnpm dev
+yarn dev
 ```
 
 Visit `/`. Expected: Home page shows the new fonts + color palette. Layout hasn't broken.
@@ -676,7 +777,7 @@ git commit -m "build resume page from JSON"
 Clone it to a scratch directory:
 
 ```bash
-cd /tmp && pnpm create emdash@latest portfolio-ref
+cd /tmp && yarn create emdash@latest portfolio-ref
 # pick Portfolio template
 ```
 
@@ -815,7 +916,7 @@ git commit -m "split RSS into separate blog + projects feeds"
 **Step 1: Apply migrations to production D1**
 
 ```bash
-pnpm wrangler d1 migrations apply joshuaheidorn-content --remote
+yarn wrangler d1 migrations apply joshuaheidorn-content --remote
 ```
 
 Expected: Migrations applied to the production DB.
@@ -823,7 +924,7 @@ Expected: Migrations applied to the production DB.
 **Step 2: Deploy**
 
 ```bash
-pnpm wrangler deploy
+yarn wrangler deploy
 ```
 
 Expected: Worker deployed, returns a `*.workers.dev` URL.

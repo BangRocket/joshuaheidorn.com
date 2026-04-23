@@ -18,7 +18,7 @@ A personal site Joshua can link from his resume and semi-professional profiles. 
 | Design system | RetroUI (NeoBrutalism), full restyle via Astro's React islands | Joshua's pick; distinctive look for a showcase site |
 | Content model | Hybrid — `posts` + `projects` in EmDash; resume + skills as JSON in-repo | Resume rarely changes and benefits from git diff; blog/projects benefit from admin UX |
 | Language | JS where possible; TS for EmDash config + future plugins | Matches Joshua's comfort (JS) without fighting EmDash (TS) |
-| Package manager | pnpm | Locked |
+| Package manager | yarn 1.x | `~/package.json` pins yarn globally; path of least resistance |
 | Comments at launch | None; defer to native EmDash comments when they land | Dodges moderation + third-party embed cost |
 
 ## Architecture

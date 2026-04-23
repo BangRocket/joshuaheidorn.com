@@ -15,7 +15,7 @@ Full design rationale lives in `docs/plans/2026-04-23-personal-site-design.md`. 
 - **Cloudflare Workers + D1 + R2** — paid tier, Dynamic Workers enabled (`worker_loaders` stays on even before plugins exist, to keep the option open)
 - **TypeScript** for EmDash config + any plugins. Astro pages/components can be `.astro` or `.jsx` — stay in JS where comfortable
 - **RetroUI** (NeoBrutalism component library) via Astro's React islands — full restyle of the Blog template
-- **pnpm** (enforced)
+- **yarn (1.x classic)** — enforced. Joshua's `~/package.json` pins `packageManager: yarn@1.22.22`, which blocks pnpm in this subtree. Do not try to switch to pnpm/npm without discussing.
 
 ## Status
 
@@ -33,11 +33,11 @@ Don't move resume/skills into EmDash without revisiting the design — the hybri
 
 Verify against `package.json` before relying on these; EmDash's scaffold may customize them:
 
-- `pnpm install`
-- `pnpm dev` — local dev with Wrangler + Astro
-- `pnpm build` — production build
-- `pnpm preview` — preview build locally
-- `pnpm deploy` or `wrangler deploy` — ship to Cloudflare
+- `yarn install` (or just `yarn`)
+- `yarn dev` — local dev with Wrangler + Astro
+- `yarn build` — production build
+- `yarn preview` — preview build locally
+- `yarn deploy` or `yarn wrangler deploy` — ship to Cloudflare
 
 No test runner at launch. Ask before adding one.
 
