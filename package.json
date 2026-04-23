@@ -1,6 +1,6 @@
 {
-	"name": "@emdash-cms/template-blog-cloudflare",
-	"version": "0.0.3",
+	"name": "joshuaheidorn",
+	"version": "0.1.0",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -12,16 +12,23 @@
 		"bootstrap": "emdash init && emdash seed",
 		"seed": "emdash seed"
 	},
+	"emdash": {
+		"seed": "./seed/seed.json"
+	},
 	"dependencies": {
 		"@astrojs/cloudflare": "^13.1.7",
 		"@astrojs/react": "^5.0.0",
 		"@emdash-cms/cloudflare": "^0.6.0",
 		"@emdash-cms/plugin-forms": "^0.1.1",
 		"@emdash-cms/plugin-webhook-notifier": "^0.1.2",
+		"@tiptap/extension-collaboration": "^3.22.4",
+		"@tiptap/y-tiptap": "^3.0.3",
 		"astro": "^6.0.1",
 		"emdash": "^0.6.0",
 		"react": "19.2.4",
-		"react-dom": "19.2.4"
+		"react-dom": "19.2.4",
+		"y-protocols": "^1.0.7",
+		"yjs": "^13.6.30"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.7",
@@ -33,5 +40,6 @@
 			"esbuild",
 			"workerd"
 		]
-	}
+	},
+	"packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

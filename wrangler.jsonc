@@ -1,27 +1,29 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-emdash-site",
+	"name": "joshuaheidorn",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "my-emdash-site",
-			// Run `wrangler d1 create my-emdash-site` and paste the real ID here for deploy
-			"database_id": "local",
-		},
+			"database_name": "joshuaheidorn-content",
+			"database_id": "b3ce9b60-bb46-40fd-b91c-f6665b3b9ee7",
+			"remote": true
+		}
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "my-emdash-media",
-		},
+			"bucket_name": "joshuaheidorn-media"
+		}
 	],
-	// Worker Loader for plugin sandboxing
+	// Worker Loader for plugin sandboxing (EmDash plugins)
 	"worker_loaders": [
 		{
-			"binding": "LOADER",
-		},
-	],
+			"binding": "LOADER"
+		}
+	]
 }
