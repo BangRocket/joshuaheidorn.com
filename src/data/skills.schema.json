@@ -1,0 +1,40 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://joshuaheidorn.com/schemas/skills.schema.json",
+	"title": "Skills",
+	"description": "Structured skills data grouped by category, consumed by /resume at build time.",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["categories"],
+	"properties": {
+		"$schema": { "type": "string" },
+		"_placeholder": { "type": "boolean" },
+		"_note": { "type": "string" },
+		"categories": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["name", "items"],
+				"properties": {
+					"name": { "type": "string", "minLength": 1 },
+					"items": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"additionalProperties": false,
+							"required": ["name"],
+							"properties": {
+								"name": { "type": "string", "minLength": 1 },
+								"proficiency": {
+									"type": "string",
+									"enum": ["beginner", "intermediate", "advanced", "expert"]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,86 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "https://joshuaheidorn.com/schemas/resume.schema.json",
+	"title": "Resume",
+	"description": "Structured resume data consumed by /resume at build time.",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["name"],
+	"properties": {
+		"$schema": { "type": "string" },
+		"_placeholder": {
+			"type": "boolean",
+			"description": "When true, /resume shows a 'placeholder content' banner. Flip to false (or delete the key) before publishing."
+		},
+		"_note": { "type": "string" },
+		"name": { "type": "string", "minLength": 1 },
+		"headline": { "type": "string" },
+		"summary": { "type": "string" },
+		"contact": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"email": { "type": "string", "format": "email" },
+				"location": { "type": "string" },
+				"links": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"additionalProperties": false,
+						"required": ["label", "url"],
+						"properties": {
+							"label": { "type": "string", "minLength": 1 },
+							"url": { "type": "string", "format": "uri" }
+						}
+					}
+				}
+			}
+		},
+		"experience": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["company", "role"],
+				"properties": {
+					"company": { "type": "string", "minLength": 1 },
+					"role": { "type": "string", "minLength": 1 },
+					"start": {
+						"type": "string",
+						"description": "YYYY or YYYY-MM.",
+						"pattern": "^\\d{4}(-\\d{2})?$"
+					},
+					"end": {
+						"type": "string",
+						"description": "YYYY, YYYY-MM, or 'present'.",
+						"pattern": "^(\\d{4}(-\\d{2})?|present)$"
+					},
+					"location": { "type": "string" },
+					"bullets": {
+						"type": "array",
+						"items": { "type": "string", "minLength": 1 }
+					},
+					"tags": {
+						"type": "array",
+						"items": { "type": "string", "minLength": 1 }
+					}
+				}
+			}
+		},
+		"education": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"additionalProperties": false,
+				"required": ["school"],
+				"properties": {
+					"school": { "type": "string", "minLength": 1 },
+					"degree": { "type": "string" },
+					"start": { "type": "string", "pattern": "^\\d{4}(-\\d{2})?$" },
+					"end": { "type": "string", "pattern": "^\\d{4}(-\\d{2})?$" },
+					"location": { "type": "string" }
+				}
+			}
+		}
+	}
+}
