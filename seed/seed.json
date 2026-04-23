@@ -65,6 +65,53 @@
 					"searchable": true
 				}
 			]
+		},
+		{
+			"slug": "projects",
+			"label": "Projects",
+			"labelSingular": "Project",
+			"supports": ["drafts", "revisions", "search", "seo"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "summary",
+					"label": "Summary",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "Cover Image",
+					"type": "image"
+				},
+				{
+					"slug": "content",
+					"label": "Case Study",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "external_url",
+					"label": "Live URL",
+					"type": "string"
+				},
+				{
+					"slug": "source_url",
+					"label": "Source / Repo URL",
+					"type": "string"
+				},
+				{
+					"slug": "featured",
+					"label": "Featured on home page",
+					"type": "boolean"
+				}
+			]
 		}
 	],
 
@@ -86,7 +133,7 @@
 			"label": "Tags",
 			"labelSingular": "Tag",
 			"hierarchical": false,
-			"collections": ["posts"],
+			"collections": ["posts", "projects"],
 			"terms": [
 				{ "slug": "webdev", "label": "Web Development" },
 				{ "slug": "opinion", "label": "Opinion" },
