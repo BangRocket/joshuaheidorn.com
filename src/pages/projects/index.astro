@@ -1,0 +1,86 @@
+---
+import { getEmDashCollection, getEntryTerms } from "emdash";
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const { entries: projects, cacheHint } = await getEmDashCollection("projects");
+Astro.cache.set(cacheHint);
+
+const sorted = projects.toSorted((a, b) => {
+	const da = a.data.publishedAt?.getTime() ?? 0;
+	const db = b.data.publishedAt?.getTime() ?? 0;
+	return db - da;
+});
+
+const projectsWithTags = await Promise.all(
+	sorted.map(async (p) => {
+		const tags = await getEntryTerms("projects", p.data.id, "tag");
+		return { project: p, tags: tags.map((t) => ({ slug: t.slug, label: t.label })) };
+	}),
+);
+---
+<Base title="Projects" description="Selected work">
+	<main class="projects-page">
+		<header class="page-head">
+			<h1>Projects</h1>
+			<p class="subtitle">Selected work. Case studies are one click in.</p>
+		</header>
+
+		{sorted.length === 0 ? (
+			<section class="empty">
+				<p>No projects yet. Add one in the <a href="/_emdash/admin/content/projects">admin</a>.</p>
+			</section>
+		) : (
+			<section class="grid">
+				{projectsWithTags.map(({ project, tags }) => (
+					<ProjectCard
+						title={project.data.title ?? "Untitled"}
+						summary={project.data.summary}
+						featuredImage={project.data.featured_image}
+						href={`/projects/${project.id}`}
+						tags={tags}
+						externalUrl={project.data.external_url}
+						sourceUrl={project.data.source_url}
+					/>
+				))}
+			</section>
+		)}
+	</main>
+</Base>
+
+<style>
+	.projects-page {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 3.5rem 1.5rem 6rem;
+	}
+	.page-head {
+		margin-bottom: 3rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 2px solid var(--color-border);
+	}
+	.page-head h1 {
+		font-family: var(--font-head);
+		font-size: clamp(2.25rem, 5vw, 3.5rem);
+		margin: 0;
+	}
+	.subtitle {
+		font-family: var(--font-sans);
+		color: var(--color-text-secondary);
+		font-size: 1.125rem;
+		margin: 0.5rem 0 0;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		gap: 2rem;
+	}
+
+	.empty {
+		padding: 3rem 0;
+		font-family: var(--font-sans);
+		color: var(--color-text-secondary);
+	}
+	.empty a { color: var(--color-text); text-decoration: underline; }
+</style>
