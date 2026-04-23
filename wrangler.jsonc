@@ -10,8 +10,7 @@
 		{
 			"binding": "DB",
 			"database_name": "joshuaheidorn-content",
-			"database_id": "b3ce9b60-bb46-40fd-b91c-f6665b3b9ee7",
-			"remote": true
+			"database_id": "b3ce9b60-bb46-40fd-b91c-f6665b3b9ee7"
 		}
 	],
 	"r2_buckets": [
