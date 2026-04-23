@@ -1,0 +1,219 @@
+---
+import {
+	getEmDashEntry,
+	getEntryTerms,
+	getSeoMeta,
+	decodeSlug,
+	getSiteSettings,
+} from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import Base from "../../layouts/Base.astro";
+import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+
+const slug = decodeSlug(Astro.params.slug);
+if (!slug) return Astro.redirect("/404");
+
+const { entry: project, cacheHint } = await getEmDashEntry("projects", slug);
+if (!project) return Astro.redirect("/404");
+
+Astro.cache.set(cacheHint);
+
+function getImageUrl(img: unknown): string | undefined {
+	if (!img || typeof img !== "object") return undefined;
+	const image = img as Record<string, unknown>;
+	if (typeof image.src === "string" && image.src) {
+		return image.src.startsWith("http") ? image.src : `${Astro.url.origin}${image.src}`;
+	}
+	const meta = image.meta as Record<string, unknown> | undefined;
+	const storageKey =
+		(typeof meta?.storageKey === "string" ? meta.storageKey : undefined) ||
+		(typeof image.id === "string" ? image.id : undefined);
+	return storageKey ? `${Astro.url.origin}/_emdash/api/media/file/${storageKey}` : undefined;
+}
+
+const featuredImageUrl = getImageUrl(project.data.featured_image);
+const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+const seo = getSeoMeta(project, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: `/projects/${slug}`,
+	defaultOgImage: featuredImageUrl,
+});
+
+const tags = await getEntryTerms("projects", project.data.id, "tag");
+---
+<Base
+	title={seo.title ?? project.data.title ?? "Project"}
+	pageTitle={seo.pageTitle ?? undefined}
+	description={seo.description}
+	image={seo.image}
+	canonical={seo.canonical}
+	type="article"
+	content={{ collection: "projects", id: project.data.id, slug }}
+>
+	<article class="case-study">
+		<header class="cs-head">
+			<a href="/projects" class="back">← All projects</a>
+			<h1>{project.data.title}</h1>
+			{project.data.summary && <p class="lede">{project.data.summary}</p>}
+			{tags.length > 0 && (
+				<ul class="chips">
+					{tags.map((t) => (
+						<li><a href={`/projects/tags/${t.slug}`} class="chip">{t.label}</a></li>
+					))}
+				</ul>
+			)}
+			<div class="meta-links">
+				{project.data.external_url && (
+					<a href={project.data.external_url} target="_blank" rel="noopener noreferrer">Live ↗</a>
+				)}
+				{project.data.source_url && (
+					<a href={project.data.source_url} target="_blank" rel="noopener noreferrer">Source ↗</a>
+				)}
+			</div>
+		</header>
+
+		{project.data.featured_image && (
+			<figure class="hero">
+				<Image image={project.data.featured_image} />
+			</figure>
+		)}
+
+		{project.data.content && (
+			<div class="body">
+				<PortableText value={project.data.content} />
+			</div>
+		)}
+	</article>
+</Base>
+
+<style>
+	.case-study {
+		max-width: 48rem;
+		margin: 0 auto;
+		padding: 3rem 1.5rem 6rem;
+	}
+	.cs-head {
+		margin-bottom: 2rem;
+	}
+	.back {
+		font-family: var(--font-sans);
+		display: inline-block;
+		margin-bottom: 1.25rem;
+		color: var(--color-text);
+		text-decoration: none;
+		font-weight: 500;
+	}
+	.back:hover { color: var(--color-accent-hover); }
+
+	.cs-head h1 {
+		font-family: var(--font-head);
+		font-size: clamp(2rem, 5vw, 3.5rem);
+		line-height: 1.05;
+		margin: 0;
+	}
+	.lede {
+		font-family: var(--font-sans);
+		font-size: 1.25rem;
+		color: var(--color-text-secondary);
+		margin: 1rem 0 0;
+		max-width: 44ch;
+	}
+
+	.chips {
+		list-style: none;
+		padding: 0;
+		margin: 1.25rem 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.chip {
+		padding: 0.2rem 0.6rem;
+		background: var(--color-accent);
+		color: var(--color-on-accent);
+		border: 2px solid var(--color-border);
+		font-family: var(--font-sans);
+		font-size: 0.8rem;
+		font-weight: 500;
+		text-decoration: none;
+	}
+	.chip:hover { background: var(--color-accent-hover); }
+
+	.meta-links {
+		display: flex;
+		gap: 1rem;
+		margin-top: 1.25rem;
+		font-family: var(--font-sans);
+	}
+	.meta-links a {
+		color: var(--color-text);
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 3px;
+	}
+	.meta-links a:hover { color: var(--color-accent-hover); }
+
+	.hero {
+		margin: 2rem 0;
+		border: 2px solid var(--color-border);
+	}
+	.hero :global(img) {
+		width: 100%;
+		height: auto;
+		display: block;
+	}
+
+	.body {
+		font-family: var(--font-sans);
+		font-size: 1.0625rem;
+		line-height: 1.7;
+	}
+	.body :global(h2) {
+		font-family: var(--font-head);
+		font-size: 1.75rem;
+		margin: 2.5rem 0 1rem;
+	}
+	.body :global(h3) {
+		font-family: var(--font-head);
+		font-size: 1.25rem;
+		margin: 2rem 0 0.75rem;
+	}
+	.body :global(p) {
+		margin: 0 0 1.1rem;
+	}
+	.body :global(a) {
+		color: var(--color-text);
+		text-decoration: underline;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 3px;
+	}
+	.body :global(a:hover) { color: var(--color-accent-hover); }
+	.body :global(blockquote) {
+		margin: 1.5rem 0;
+		padding: 0.5rem 1rem;
+		border-left: 4px solid var(--color-accent);
+		background: var(--color-bg-subtle);
+		font-style: italic;
+	}
+	.body :global(code) {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		padding: 0.1rem 0.35rem;
+		background: var(--color-bg-subtle);
+		border: 1px solid var(--color-border-subtle);
+	}
+	.body :global(pre) {
+		background: var(--color-text);
+		color: var(--color-bg);
+		padding: 1rem;
+		border: 2px solid var(--color-border);
+		overflow-x: auto;
+	}
+	.body :global(pre code) {
+		background: transparent;
+		border: none;
+		padding: 0;
+		color: inherit;
+	}
+</style>
