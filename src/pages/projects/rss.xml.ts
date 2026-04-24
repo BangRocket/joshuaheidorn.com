@@ -1,24 +1,30 @@
 import type { APIRoute } from "astro";
-import { getEmDashCollection, getSiteSettings } from "emdash";
+import { getSiteSettings } from "emdash";
 
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
+import projectsData from "../../data/projects.json";
+
+export const prerender = false;
 
 export const GET: APIRoute = async ({ site, url }) => {
 	const siteUrl = site?.toString() || url.origin;
 	const { siteTitle } = resolveBlogSiteIdentity(await getSiteSettings());
 
-	const { entries: projects } = await getEmDashCollection("projects", {
-		orderBy: { published_at: "desc" },
-		limit: 40,
-	});
+	const sorted = [...projectsData.projects]
+		.filter((p) => p.publishedAt)
+		.sort((a, b) => {
+			const da = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+			const db = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+			return db - da;
+		})
+		.slice(0, 40);
 
-	const items = projects
+	const items = sorted
 		.map((project) => {
-			if (!project.data.publishedAt) return null;
-			const pubDate = project.data.publishedAt.toUTCString();
-			const projectUrl = `${siteUrl}/projects/${project.id}`;
-			const title = escapeXml(project.data.title || "Untitled");
-			const description = escapeXml(project.data.summary || "");
+			const pubDate = new Date(project.publishedAt!).toUTCString();
+			const projectUrl = `${siteUrl}/projects/${project.slug}`;
+			const title = escapeXml(project.title || "Untitled");
+			const description = escapeXml(project.summary || "");
 			return `    <item>
       <title>${title}</title>
       <link>${projectUrl}</link>
@@ -27,7 +33,6 @@ export const GET: APIRoute = async ({ site, url }) => {
       <description>${description}</description>
     </item>`;
 		})
-		.filter(Boolean)
 		.join("\n");
 
 	const rss = `<?xml version="1.0" encoding="UTF-8"?>

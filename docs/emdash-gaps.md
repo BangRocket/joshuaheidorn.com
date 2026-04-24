@@ -2,6 +2,28 @@
 
 Running log of upstream EmDash / ecosystem bugs we've hit, with workarounds. Per the design doc's "fill gaps later" posture, these are candidates for plugin work, patches, or issues upstream.
 
+## 🔴 `projects` publish fails with `SQLITE_CORRUPT_VTAB` on remote D1 — collection retired
+
+**Symptom:** Publishing any entry in the `projects` collection via `/_emdash/api/content/projects/:id/publish` returns HTTP 500. Worker log: `D1_ERROR: database disk image is malformed: SQLITE_CORRUPT (extended: SQLITE_CORRUPT_VTAB)`. Posts and pages publish cleanly.
+
+**Root cause:** Not conclusively identified. Characterized on 2026-04-24:
+
+- FTS5 `integrity-check` on all three `_emdash_fts_*` tables passes.
+- Rebuilt `_emdash_fts_projects` index from scratch (DROP + CREATE + `INSERT INTO fts(fts) VALUES('rebuild')`). No effect.
+- Bug reproduces via plain CLI `UPDATE ec_projects SET <fts-indexed-col> = <any-non-NULL>` (e.g., `summary = 'x'`). Same UPDATE on `ec_posts`/`ec_pages` works. Same UPDATE on `ec_projects.updated_at` (non-FTS col) works. Same UPDATE on `ec_projects.title` with a value change works.
+- Reducing `_emdash_fts_projects` to 2 indexed columns (matching posts/pages shape) did **not** resolve — value-change UPDATEs on `content` still fail.
+- Appears to be a D1 storage-layer issue specific to this `ec_projects` table that FTS layer operations can't reach. Not reproducible by hand on a fresh table.
+
+**Resolution (2026-04-24):** Retired the `projects` EmDash collection. Projects are now repo-local JSON at `src/data/projects.json` (mirrors the `resume.json` / `skills.json` pattern). Routes under `src/pages/projects/*` read from JSON instead of `getEmDashCollection("projects")`. Loses CMS-backed authoring, taxonomy-backed tag filtering, and cross-collection search. Keeps `/projects` landing, `/projects/<slug>` case study, `/projects/tags/<tag>`, RSS — all from JSON.
+
+**Leftover cleanup (optional, does not block anything):**
+
+- `ec_projects`, `_emdash_fts_projects` (+ 4 shadow tables), 3 triggers, and projects-collection revisions remain in both remote D1 and local miniflare D1. Inert — no code queries them.
+- `seed/seed.json` may still reference a `projects` collection. Re-seeding won't affect runtime since no route reads it.
+- EmDash auto-generates `Project` in `emdash-env.d.ts`; will self-update on next `yarn dev` once the collection is dropped.
+
+**If upstream fixes the underlying D1 / FTS5 issue**, we can re-adopt EmDash projects by reversing these steps. Filed on the `projects` side only — posts/pages remain on EmDash.
+
 ## 🔴 Admin UI crashes with React error #300 (blocking)
 
 **Symptom:** Opening `/_emdash/admin/*` in the browser produces `Error: Minified React error #300` (element type is invalid). The React island never hydrates; admin is unusable end-to-end. Affects login/setup/content pages.

@@ -1,10 +1,15 @@
 ---
-import { Image } from "emdash/ui";
+interface FeaturedImage {
+	src: string;
+	alt?: string;
+	width?: number;
+	height?: number;
+}
 
 interface Props {
 	title: string;
 	summary?: string | null;
-	featuredImage?: any;
+	featuredImage?: FeaturedImage | null;
 	href: string;
 	tags?: Array<{ slug: string; label: string }>;
 	externalUrl?: string | null;
@@ -17,7 +22,13 @@ const { title, summary, featuredImage, href, tags = [], externalUrl, sourceUrl }
 	<a href={href} class="cover-link" aria-label={title}>
 		{featuredImage ? (
 			<div class="cover">
-				<Image image={featuredImage} />
+				<img
+					src={featuredImage.src}
+					alt={featuredImage.alt ?? ""}
+					width={featuredImage.width}
+					height={featuredImage.height}
+					loading="lazy"
+				/>
 			</div>
 		) : (
 			<div class="cover placeholder" aria-hidden="true">

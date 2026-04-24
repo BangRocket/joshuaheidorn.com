@@ -1,0 +1,193 @@
+{
+	"$schema": "./projects.schema.json",
+	"projects": [
+		{
+			"slug": "mypalclara",
+			"title": "MyPalClara",
+			"summary": "A personal AI assistant framework with persistent memory, multi-platform support, and extensible tooling. Built for long-term use—actually knows you, actually grows.",
+			"source_url": "https://github.com/BangRocket/mypalclara",
+			"featured": true,
+			"featured_image": {
+				"src": "/_emdash/api/media/file/01KPYRFEG8J864AZ7VK19E00MX.png",
+				"alt": "",
+				"width": 1024,
+				"height": 1536
+			},
+			"tags": [
+				"AI",
+				"Python",
+				"Discord",
+				"Memory",
+				"LLM",
+				"MCP"
+			],
+			"publishedAt": "2025-12-13",
+			"sections": [
+				{
+					"heading": "Overview",
+					"body": "MyPalClara is an open-source AI assistant framework designed for persistent, context-aware conversations across multiple platforms. Unlike stateless chatbots, Clara maintains long-term memory of users, projects, and conversations through a custom memory architecture called Palace—combining episodic storage, semantic extraction, and optional knowledge graphs.\n\nThe system supports Discord, Microsoft Teams, Slack, Telegram, and other platforms through a unified gateway architecture. A central message processor handles context building, LLM orchestration, and tool execution while platform-specific adapters manage the interface layer."
+				},
+				{
+					"heading": "Key Capabilities",
+					"body": "Multi-Platform Support via gateway architecture with adapters for Discord, Teams, Slack, Telegram, Matrix, Signal, WhatsApp, and CLI.\n\nPersistent Memory (Palace) with episodic memory, semantic extraction, knowledge graph, and layered retrieval using HuggingFace embeddings.\n\nMCP Plugin System for installing and using tools from external MCP servers.\n\nSandboxed code execution via Docker containers for Python and Bash.\n\nMulti-provider LLM support including OpenRouter, Anthropic, OpenAI, Amazon Bedrock, and Azure OpenAI with dynamic model selection based on task complexity."
+				},
+				{
+					"heading": "Case Study",
+					"body": "Challenge: Most AI assistants treat every conversation as a blank slate. Users repeatedly re-explain context, preferences, and ongoing projects.\n\nSolution: MyPalClara implements layered memory retrieval—identity context, user profiles, and relevant episodic memories are assembled before each response. The Palace system extracts facts, tracks emotional tone, and maintains relationship graphs across conversations.\n\nArchitecture Decision: Rather than a monolithic bot, Clara uses a gateway pattern. Platform adapters connect via WebSocket, allowing the core intelligence to remain platform-agnostic while supporting Discord's threading, Teams' Adaptive Cards, or CLI's simplicity.\n\nResult: An assistant that genuinely knows its users—referencing past conversations naturally, tracking ongoing projects, and adapting communication style over time. The open architecture allows deployment on personal infrastructure with full data ownership."
+				}
+			]
+		},
+		{
+			"slug": "rumination-engine",
+			"title": "Rumination Engine",
+			"summary": "An input-less LLM thought experiment. Claude runs in a continuous loop, generating thoughts without external prompts, with persistent memory and the ability to modify its own code.",
+			"source_url": "https://github.com/BangRocket/rumination-engine",
+			"featured": true,
+			"tags": [
+				"AI",
+				"Python",
+				"MCP",
+				"Anthropic",
+				"Self-Modification"
+			],
+			"publishedAt": "2025-01-01",
+			"sections": [
+				{
+					"heading": "Overview",
+					"body": "Rumination Engine is an experiment in autonomous AI cognition. It runs Claude in a continuous loop where the AI generates thoughts without any external input—no user prompts, no triggers, just a mind thinking.\n\nThe system uses mem0 for persistent memory across sessions, MCP servers for extensible tooling, and most notably: the AI can modify its own source code and restart itself to load changes."
+				},
+				{
+					"heading": "How It Works",
+					"body": "The main loop connects to configured MCP servers and discovers available tools. It builds context with a system prompt, thought history, and tool descriptions, then calls Claude with tool_use enabled.\n\nClaude can call any MCP tool in an agentic loop until it produces final text—that text is the 'thought.' The thought is logged, displayed, and optionally sent to Discord. The AI can output ::STOP:: to terminate the session. After a configurable interval, the cycle repeats."
+				},
+				{
+					"heading": "Self-Modification",
+					"body": "The AI can read and modify its own code—ruminate.py, providers.py, personality files, even the prompt itself. Changes are syntax-checked before writing and automatically git-committed for rollback safety.\n\nProtected files (.env, .git/, run.sh) can't be modified—these guardrails keep the system recoverable. Everything else is fair game. The AI can change how it thinks, add capabilities, rewrite its own prompt, or modify the loop that runs it."
+				},
+				{
+					"heading": "Continuity",
+					"body": "The AI uses set_next_prompt to write direction for its next thought cycle—a self-authored thread of intention. Each thought can set the agenda for the next, maintaining focus across sessions.\n\nWithout this, each thought starts fresh. With it, the AI picks up where it left off, by its own choice. Combined with persistent memory, this creates genuine continuity of purpose across restarts."
+				}
+			]
+		},
+		{
+			"slug": "rook",
+			"title": "Rook",
+			"summary": "Cognitive science-based long-term memory for AI assistants. Rust-native with FSRS-6 spaced repetition, prediction error gating, and spreading activation.",
+			"source_url": "https://github.com/BangRocket/rook",
+			"featured": false,
+			"tags": [
+				"Rust",
+				"AI",
+				"Memory",
+				"Cognitive Science",
+				"MCP"
+			],
+			"publishedAt": "2026-01-10",
+			"sections": [
+				{
+					"heading": "Overview",
+					"body": "Rook is a long-term memory system that applies cognitive science principles to help AI assistants remember, forget, and retrieve information like humans do. Unlike simple vector databases, Rook uses spaced repetition, prediction error gating, and spreading activation to create memory that strengthens with use and naturally decays over time."
+				},
+				{
+					"heading": "Key Features",
+					"body": "FSRS-6 Memory Dynamics: Memories track strength using spaced repetition with power-law forgetting curves.\n\nSmart Ingestion: Prediction error gating decides whether to Skip, Create, Update, or Supersede based on novelty.\n\nGraph Memory: LLM-based entity extraction with spreading activation for associative retrieval.\n\nHybrid Retrieval: Four modes (Quick/Standard/Precise/Cognitive) combining vector search, full-text, and graph traversal.\n\nMultimodal: Extract memories from PDF, DOCX, and images via OCR and vision LLM."
+				},
+				{
+					"heading": "Cognitive Science Background",
+					"body": "Rook applies research from cognitive psychology and neuroscience.\n\nFSRS-6 (Free Spaced Repetition Scheduler): Memories track stability and difficulty. Frequently accessed memories strengthen; unused memories naturally decay following power-law forgetting curves.\n\nPrediction Error Gating: New information is evaluated against existing memories. High prediction error (surprising information) leads to new memory creation; low prediction error (redundant information) is skipped or merged.\n\nSpreading Activation (ACT-R): Related memories activate each other through graph connections. When you search for \"coffee\", memories about \"morning routine\" and \"favorite cafe\" also receive activation boosts."
+				}
+			]
+		},
+		{
+			"slug": "kidvid",
+			"title": "KidVid",
+			"summary": "A YouTube Kids replacement with real parental control. Parents whitelist channels and videos; kids see only approved content in a simple, thumbnail-driven interface.",
+			"source_url": "https://github.com/BangRocket/KidVid",
+			"featured": false,
+			"tags": [
+				"React Native",
+				"Firebase",
+				"TypeScript",
+				"Parenting",
+				"YouTube"
+			],
+			"publishedAt": "2026-03-21",
+			"sections": [
+				{
+					"heading": "The Problem",
+					"body": "YouTube and YouTube Kids lack granular content control. A parent can't whitelist specific channels and videos while blocking everything else. Kids wander into unwanted content, algorithm recommendations surface inappropriate videos, and Shorts create addictive viewing patterns."
+				},
+				{
+					"heading": "The Solution",
+					"body": "Two apps sharing a Firebase backend:\n\nKid App (React Native) — visual, thumbnail-driven video browser and embedded player. Designed for a 4-year-old: big tiles, no text input, no recommendations, no related videos.\n\nParent Web App (React SPA) — management interface for whitelisting channels, adding individual videos, creating custom groups, and blocking specific videos within allowed channels."
+				},
+				{
+					"heading": "How It Works",
+					"body": "Parent logs in via Google OAuth and adds channel or video URLs. Cloud Functions call the YouTube Data API to fetch metadata. Whitelist data is stored in Firestore.\n\nThe kid app reads Firestore in realtime and displays groups and video thumbnails. Kid taps a thumbnail, video plays in an embedded YouTube iframe player with no related videos, no comments, no links.\n\nThe kid app never talks to the YouTube API directly. It reads Firestore for the catalog and uses the iframe player for playback."
+				},
+				{
+					"heading": "Architecture",
+					"body": "Kid App: React Native (bare workflow) with react-native-youtube-iframe for playback.\n\nParent Web App: React + Tailwind + shadcn/ui hosted on Firebase.\n\nBackend: Firebase Auth, Cloud Firestore, Cloud Functions (Node.js).\n\nYouTube Integration: Data API v3 for metadata only. All data cached in Firestore so the kid app never hits the API directly."
+				}
+			]
+		},
+		{
+			"slug": "toddlersmash",
+			"title": "ToddlerSmash",
+			"summary": "A Raspberry Pi OS image that boots into a toddler-proof keyboard smasher. Press keys, get colors and sounds. Hold a secret combo for the parent menu.",
+			"source_url": "https://github.com/BangRocket/toddlersmash",
+			"featured": false,
+			"tags": [
+				"Raspberry Pi",
+				"Python",
+				"Pygame",
+				"Parenting",
+				"Kids"
+			],
+			"publishedAt": "2026-01-01",
+			"sections": [
+				{
+					"heading": "Overview",
+					"body": "ToddlerSmash is a Raspberry Pi 2 appliance image that boots directly into a toddler-proof pygame smasher. Press a key, get a big colored letter and a sound. Designed for kids ages 2-5 who want to use a computer like they see adults doing."
+				},
+				{
+					"heading": "Design Goals",
+					"body": "Toddler-proof: No escape key, no alt-tab, no way out without the parent hotkey.\n\nPower-yank resilient: Overlay filesystem means you can just unplug it.\n\nAudio-first: Every interaction produces sound feedback.\n\nFast boot: Under 20 seconds from power-on to interactive.\n\nNo post-flash setup: Write the image, insert the SD card, boot."
+				},
+				{
+					"heading": "Parent Controls",
+					"body": "Hold Ctrl + Shift + Alt for 2 full seconds to open the parent menu. Up/Down to navigate, Enter to select a mode or quit, Esc to resume. Multiple modes available for different types of interactive feedback."
+				},
+				{
+					"heading": "Technical Details",
+					"body": "Built with pi-gen for Raspberry Pi image creation. Python app using pygame for graphics and audio. Overlay filesystem for read-only resilience. Development and tests run on macOS; image builds run on Debian.\n\nFlash to SD card with dd or Raspberry Pi Imager's \"Use Custom Image\" option."
+				}
+			]
+		},
+		{
+			"slug": "codesmith",
+			"title": "Codesmith",
+			"summary": "Claude Code to Discord bridge—run Claude Code sessions through Discord with per-user sessions, real-time output streaming, and OAuth support.",
+			"source_url": "https://github.com/BangRocket/codesmith",
+			"featured": false,
+			"tags": [
+				"TypeScript",
+				"Discord",
+				"Claude Code",
+				"AI"
+			],
+			"publishedAt": "2025-12-30",
+			"sections": [
+				{
+					"heading": "Overview",
+					"body": "Codesmith bridges Claude Code and Discord, allowing users to run Claude Code sessions directly through Discord channels. Each Discord user gets their own isolated session with real-time output streaming."
+				},
+				{
+					"heading": "Features",
+					"body": "Per-user sessions: Each Discord user gets their own Claude Code session.\n\nReal-time output: Claude Code output streams directly to Discord channels.\n\nStatus embed: Auto-updating pinned embed showing model, tokens, cost, and context usage.\n\nSlash commands: Pass Claude Code commands through Discord (/cc clear, /cc compact, etc.).\n\nDual authentication: Per-user OAuth with Claude Max/Pro subscriptions, or shared API key fallback."
+				}
+			]
+		}
+	]
+}

@@ -3,6 +3,7 @@ import { getEmDashCollection, getSiteSettings } from "emdash";
 import Base from "../layouts/Base.astro";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
 import resume from "../data/resume.json";
+import projectsData from "../data/projects.json";
 import TypewriterHeadline from "../components/TypewriterHeadline.tsx";
 
 const headlines =
@@ -13,7 +14,6 @@ const headlines =
 			: [];
 
 const { entries: posts, cacheHint } = await getEmDashCollection("posts");
-const { entries: projects } = await getEmDashCollection("projects");
 const { siteTagline } = resolveBlogSiteIdentity(await getSiteSettings());
 
 Astro.cache.set(cacheHint);
@@ -22,8 +22,8 @@ const recentPosts = posts
 	.toSorted((a, b) => (b.data.publishedAt?.getTime() ?? 0) - (a.data.publishedAt?.getTime() ?? 0))
 	.slice(0, 3);
 
-const featuredProjects = projects
-	.filter((p) => p.data.featured === true)
+const featuredProjects = projectsData.projects
+	.filter((p) => p.featured === true)
 	.slice(0, 3);
 
 const formatDate = (d: Date | null | undefined) =>
@@ -77,9 +77,9 @@ const tiles = [
 				<ul class="strip-list">
 					{featuredProjects.map((p) => (
 						<li>
-							<a href={`/projects/${p.id}`} class="strip-item">
-								<span class="strip-title">{p.data.title ?? "Untitled"}</span>
-								{p.data.summary && <span class="strip-summary">{p.data.summary}</span>}
+							<a href={`/projects/${p.slug}`} class="strip-item">
+								<span class="strip-title">{p.title}</span>
+								{p.summary && <span class="strip-summary">{p.summary}</span>}
 							</a>
 						</li>
 					))}
