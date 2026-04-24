@@ -31,9 +31,27 @@ export interface Post {
   bylines?: ContentBylineCredit[];
 }
 
+export interface Project {
+  id: string;
+  slug: string | null;
+  status: string;
+  title: string;
+  summary?: string;
+  featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number };
+  content?: PortableTextBlock[];
+  external_url?: string;
+  source_url?: string;
+  featured?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  publishedAt: Date | null;
+  bylines?: ContentBylineCredit[];
+}
+
 declare module "emdash" {
   interface EmDashCollections {
     pages: Page;
     posts: Post;
+    projects: Project;
   }
 }
