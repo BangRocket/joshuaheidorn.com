@@ -1,39 +1,78 @@
 {
 	"$schema": "./resume.schema.json",
-	"_placeholder": true,
-	"_note": "Replace placeholder values before publishing. This is a scaffolded starter.",
 	"name": "Joshua Heidorn",
-	"headline": "Software Engineer",
-	"summary": "One-paragraph pitch goes here. Edit src/data/resume.json to update.",
+	"headline": "Full-Stack Software Engineer",
+	"summary": "Full-stack software engineer with 8+ years of experience building scalable applications, developer tools, and AI-powered systems. Strong expertise in React and TypeScript with a focus on user experience, interface optimization, and workflow improvement. Currently building AI tools including MyPalClara (a LangGraph-based agentic assistant) and ASMIS (an ML-powered trading system). Experienced leading development teams in security-focused environments and comfortable wherever reliability matters.",
 	"contact": {
-		"email": "stairmaster401@gmail.com",
-		"location": "",
+		"email": "heidornj@icloud.com",
+		"location": "Delaware, OH",
 		"links": [
-			{ "label": "GitHub", "url": "https://github.com/" },
-			{ "label": "LinkedIn", "url": "https://www.linkedin.com/" }
+			{ "label": "GitHub", "url": "https://github.com/BangRocket" },
+			{ "label": "LinkedIn", "url": "https://www.linkedin.com/in/joshuaheidorn" }
 		]
 	},
 	"experience": [
 		{
-			"company": "Placeholder Company",
-			"role": "Placeholder Role",
-			"start": "2020-01",
-			"end": "present",
-			"location": "",
+			"company": "Solutions Through Innovative Technologies Inc. (STI-TEC)",
+			"role": "Web Developer",
+			"start": "2023-10",
+			"end": "2025-08",
+			"location": "Fairborn, OH",
 			"bullets": [
-				"Describe a responsibility or accomplishment here.",
-				"Another bullet. Keep these tight and outcome-focused."
+				"Took full ownership of the Sample Lifecycle Application, managing day-to-day tickets and refining backend processes to improve operational efficiency.",
+				"Subcontracted to the US Air Force supporting the LIMS Lifecycle application team, building mission-critical features under stringent security and compliance requirements.",
+				"Led comprehensive refactoring of legacy code to improve readability and maintainability for mission-critical operations.",
+				"Collaborated directly with customers to gather requirements and implement UI features informed by real user feedback.",
+				"Created comprehensive technical documentation and training materials that measurably improved team productivity."
 			],
-			"tags": ["placeholder"]
+			"tags": ["ColdFusion", "Oracle", "JavaScript", "Government", "Security+"]
+		},
+		{
+			"company": "Benchmark Digital Partners LLC",
+			"role": "Senior Product Developer / Team Lead",
+			"start": "2021-01",
+			"end": "2023-09",
+			"location": "Mason, OH",
+			"bullets": [
+				"Led development teams in an Agile environment, planning sprints and running standups to deliver multiple enterprise applications on schedule.",
+				"Drove a 20% improvement in application speed and reliability through a modernization of the Forms UI and backend.",
+				"Managed multiple applications across the suite including Forms, Equipment Tracker, Tag-it-Bot, and Authentication.",
+				"Mentored junior developers, established coding standards, and participated in performance reviews and hiring interviews.",
+				"Partnered with sales, customer success, and engineering stakeholders to align technical work with business goals and funding estimates."
+			],
+			"tags": ["React", "TypeScript", "Node.js", "Agile", "Team Lead"]
+		},
+		{
+			"company": "Gensuite LLC",
+			"role": "Product Development Manager",
+			"start": "2016-03",
+			"end": "2021-01",
+			"location": "Mason, OH",
+			"bullets": [
+				"Progressed from Associate Product Developer to Lead Product Development Manager, taking complete ownership of the Forms application.",
+				"Built and maintained React/TypeScript interfaces for enterprise solutions serving thousands of users.",
+				"Established timelines, goals, and funding estimates for both short- and long-term development projects; led client meetings to align objectives.",
+				"Developed and maintained a custom Apache Solr implementation used across internal and customer-facing applications.",
+				"Served as PDLP (Product Developer Learning Path) mentor to junior developers across multiple application teams.",
+				"Contributed to a company-wide initiative converting existing pages to Bootstrap 4."
+			],
+			"tags": ["JavaScript", "React", "Vue.js", "MySQL", "Solr", "SaaS"]
 		}
 	],
 	"education": [
 		{
-			"school": "Placeholder University",
-			"degree": "Placeholder Degree",
-			"start": "2014",
-			"end": "2018",
-			"location": ""
+			"school": "University of Cincinnati",
+			"degree": "Bachelor of Arts, English",
+			"start": "2009",
+			"end": "2013",
+			"location": "Cincinnati, OH"
+		},
+		{
+			"school": "Cincinnati State Technical and Community College",
+			"degree": "Computer Programming and Database Management",
+			"start": "2016",
+			"end": "2017",
+			"location": "Cincinnati, OH"
 		}
 	]
 }

@@ -1,30 +1,90 @@
 {
 	"$schema": "./skills.schema.json",
-	"_placeholder": true,
-	"_note": "Replace placeholder values before publishing.",
 	"categories": [
 		{
 			"name": "Languages",
 			"items": [
-				{ "name": "TypeScript" },
-				{ "name": "JavaScript" },
-				{ "name": "Python" }
+				{ "name": "JavaScript", "proficiency": "expert" },
+				{ "name": "TypeScript", "proficiency": "advanced" },
+				{ "name": "Python", "proficiency": "advanced" },
+				{ "name": "PHP", "proficiency": "intermediate" },
+				{ "name": "ColdFusion (CFML)", "proficiency": "advanced" },
+				{ "name": "Java", "proficiency": "intermediate" },
+				{ "name": "C#", "proficiency": "intermediate" },
+				{ "name": "SQL", "proficiency": "advanced" },
+				{ "name": "HTML5 / CSS3", "proficiency": "expert" }
 			]
 		},
 		{
-			"name": "Frameworks & Tools",
+			"name": "Frontend",
 			"items": [
-				{ "name": "React" },
-				{ "name": "Astro" },
-				{ "name": "Node.js" }
+				{ "name": "React", "proficiency": "advanced" },
+				{ "name": "Vue.js", "proficiency": "advanced" },
+				{ "name": "Angular", "proficiency": "intermediate" },
+				{ "name": "Astro", "proficiency": "intermediate" },
+				{ "name": "jQuery", "proficiency": "expert" },
+				{ "name": "Bootstrap", "proficiency": "advanced" }
 			]
 		},
 		{
-			"name": "Infrastructure",
+			"name": "Backend & APIs",
 			"items": [
-				{ "name": "Cloudflare Workers" },
-				{ "name": "Docker" },
-				{ "name": "PostgreSQL" }
+				{ "name": "Node.js", "proficiency": "advanced" },
+				{ "name": "REST APIs", "proficiency": "expert" },
+				{ "name": "GraphQL", "proficiency": "intermediate" },
+				{ "name": "ASP.NET", "proficiency": "intermediate" },
+				{ "name": "LAMP / LEMP Stack", "proficiency": "advanced" }
+			]
+		},
+		{
+			"name": "AI / ML",
+			"items": [
+				{ "name": "LLM Integration (Claude, OpenAI)", "proficiency": "advanced" },
+				{ "name": "LangGraph", "proficiency": "advanced" },
+				{ "name": "Prompt Engineering", "proficiency": "advanced" },
+				{ "name": "Agentic Orchestration", "proficiency": "advanced" },
+				{ "name": "Tool-Use Patterns", "proficiency": "advanced" },
+				{ "name": "Vector Search (pgvector)", "proficiency": "intermediate" }
+			]
+		},
+		{
+			"name": "Databases",
+			"items": [
+				{ "name": "PostgreSQL", "proficiency": "advanced" },
+				{ "name": "MySQL", "proficiency": "expert" },
+				{ "name": "Microsoft SQL Server", "proficiency": "advanced" },
+				{ "name": "Oracle", "proficiency": "advanced" },
+				{ "name": "Redis", "proficiency": "intermediate" },
+				{ "name": "Apache Solr", "proficiency": "advanced" }
+			]
+		},
+		{
+			"name": "Infrastructure & DevOps",
+			"items": [
+				{ "name": "AWS", "proficiency": "intermediate" },
+				{ "name": "Azure", "proficiency": "intermediate" },
+				{ "name": "GCP", "proficiency": "beginner" },
+				{ "name": "Docker", "proficiency": "advanced" },
+				{ "name": "Linux", "proficiency": "advanced" },
+				{ "name": "Git / GitHub", "proficiency": "expert" },
+				{ "name": "GitHub Actions", "proficiency": "intermediate" },
+				{ "name": "CI/CD Pipelines", "proficiency": "intermediate" }
+			]
+		},
+		{
+			"name": "Practices & Leadership",
+			"items": [
+				{ "name": "Agile / Scrum", "proficiency": "advanced" },
+				{ "name": "Team Leadership & Mentoring", "proficiency": "advanced" },
+				{ "name": "Stakeholder Management", "proficiency": "advanced" },
+				{ "name": "Test-Driven Development", "proficiency": "advanced" },
+				{ "name": "User Research & Usability Testing", "proficiency": "intermediate" }
+			]
+		},
+		{
+			"name": "Certifications",
+			"items": [
+				{ "name": "CompTIA Security+ (SY0-601)", "proficiency": "advanced" }
 			]
 		}
 	]
