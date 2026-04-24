@@ -7,12 +7,18 @@
 		"React + TypeScript Specialist",
 		"AI Agent Builder",
 		"Team Lead & Mentor",
-		"Reliability-Minded Generalist"
+		"Reliability-Minded Generalist",
+		"Builder of Agentic Systems",
+		"Full-Stack Engineer Working on AI Tooling",
+		"Developer Tools & Interface Design",
+		"Engineer Focused on Human-AI Collaboration",
+		"Full-Stack Engineer, Security+ Certified"
+		
 	],
-	"summary": "Full-stack software engineer with 8+ years of experience building scalable applications, developer tools, and AI-powered systems. Strong expertise in React and TypeScript with a focus on user experience, interface optimization, and workflow improvement. Currently building AI tools including MyPalClara (a LangGraph-based agentic assistant) and ASMIS (an ML-powered trading system). Experienced leading development teams in security-focused environments and comfortable wherever reliability matters.",
+	"summary": "Full-stack software engineer with 10+ years of experience building scalable applications, developer tools, and AI-powered systems. Strong expertise in React and TypeScript with a focus on user experience, interface optimization, and workflow improvement. Currently building an AI tool named MyPalClara (a LangGraph-based agentic assistant and companion). Experienced leading development teams in security-focused environments and comfortable wherever reliability matters.",
 	"contact": {
 		"email": "contact@joshuaheidorn.com",
-		"location": "Delaware, OH",
+		"location": "Columbus, OH",
 		"links": [
 			{ "label": "GitHub", "url": "https://github.com/BangRocket" },
 			{ "label": "LinkedIn", "url": "https://www.linkedin.com/in/joshuaheidorn" }
