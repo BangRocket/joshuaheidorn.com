@@ -15,6 +15,11 @@
 		"_note": { "type": "string" },
 		"name": { "type": "string", "minLength": 1 },
 		"headline": { "type": "string" },
+		"headlines": {
+			"type": "array",
+			"description": "Optional list cycled by the typewriter effect on the home hero. Falls back to `headline` when missing or empty.",
+			"items": { "type": "string", "minLength": 1 }
+		},
 		"summary": { "type": "string" },
 		"contact": {
 			"type": "object",

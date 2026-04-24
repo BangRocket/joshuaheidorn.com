@@ -2,6 +2,13 @@
 	"$schema": "./resume.schema.json",
 	"name": "Joshua Heidorn",
 	"headline": "Full-Stack Software Engineer",
+	"headlines": [
+		"Full-Stack Software Engineer",
+		"React + TypeScript Specialist",
+		"AI Agent Builder",
+		"Team Lead & Mentor",
+		"Reliability-Minded Generalist"
+	],
 	"summary": "Full-stack software engineer with 8+ years of experience building scalable applications, developer tools, and AI-powered systems. Strong expertise in React and TypeScript with a focus on user experience, interface optimization, and workflow improvement. Currently building AI tools including MyPalClara (a LangGraph-based agentic assistant) and ASMIS (an ML-powered trading system). Experienced leading development teams in security-focused environments and comfortable wherever reliability matters.",
 	"contact": {
 		"email": "contact@joshuaheidorn.com",

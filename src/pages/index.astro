@@ -3,6 +3,14 @@ import { getEmDashCollection, getSiteSettings } from "emdash";
 import Base from "../layouts/Base.astro";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
 import resume from "../data/resume.json";
+import TypewriterHeadline from "../components/TypewriterHeadline.tsx";
+
+const headlines =
+	Array.isArray(resume.headlines) && resume.headlines.length > 0
+		? resume.headlines
+		: resume.headline
+			? [resume.headline]
+			: [];
 
 const { entries: posts, cacheHint } = await getEmDashCollection("posts");
 const { entries: projects } = await getEmDashCollection("projects");
@@ -40,7 +48,13 @@ const tiles = [
 		<section class="hero">
 			<p class="eyebrow">Hello,</p>
 			<h1 class="name">I'm {resume.name}.</h1>
-			<p class="headline">{resume.headline}</p>
+			<p class="headline">
+				{headlines.length > 0 ? (
+					<TypewriterHeadline phrases={headlines} client:load />
+				) : (
+					resume.headline
+				)}
+			</p>
 			{resume.summary && <p class="summary">{resume.summary}</p>}
 		</section>
 
@@ -129,6 +143,27 @@ const tiles = [
 		font-weight: 500;
 		color: var(--color-text);
 		margin: 1rem 0 0;
+		min-height: 1.5em;
+	}
+	.typewriter {
+		display: inline-flex;
+		align-items: baseline;
+		white-space: pre;
+	}
+	.typewriter-caret {
+		display: inline-block;
+		margin-left: 2px;
+		font-family: var(--font-head);
+		color: var(--color-accent);
+		font-weight: 700;
+		animation: typewriter-blink 1s steps(1) infinite;
+	}
+	@keyframes typewriter-blink {
+		0%, 50% { opacity: 1; }
+		51%, 100% { opacity: 0; }
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.typewriter-caret { animation: none; opacity: 1; }
 	}
 	.summary {
 		font-family: var(--font-sans);
