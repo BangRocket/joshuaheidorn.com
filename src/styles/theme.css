@@ -25,9 +25,8 @@
 	--color-on-accent: #000000;
 	--color-accent-ring: color-mix(in srgb, var(--color-accent) 40%, transparent);
 
-	/* Deep blue reserved for NeoBrutalism offset shadows so the "pop" has
-	   character instead of pure black everywhere. */
-	--color-shadow: #1e40af;
+	/* Offset shadow uses the same yellow accent site-wide */
+	--color-shadow: var(--color-accent);
 
 	/* EmDash search widget follows palette */
 	--emdash-search-bg: var(--color-bg);
@@ -57,6 +56,5 @@ h1, h2, h3, h4, h5, h6 {
 	--color-accent-hover: #ffcc00;
 	--color-on-accent: #000000;
 
-	/* Brighter blue in dark mode so the shadow is still visible on near-black bg */
-	--color-shadow: #3b82f6;
+	--color-shadow: var(--color-accent);
 }
