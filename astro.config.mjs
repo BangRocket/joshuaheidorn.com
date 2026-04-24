@@ -20,7 +20,10 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: d1({ binding: "DB", session: "auto" }),
+			// session: "auto" caches D1 bookmark tokens in browser state. Any time
+			// the D1 database is rebuilt (new id), old bookmarks are rejected and
+			// every cached visitor gets D1_ERROR: invalid commitToken. Disabled.
+			database: d1({ binding: "DB" }),
 			storage: r2({ binding: "MEDIA" }),
 			plugins: [formsPlugin()],
 			sandboxed: [webhookNotifierPlugin()],
