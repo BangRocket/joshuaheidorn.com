@@ -41,6 +41,10 @@ Verify against `package.json` before relying on these; EmDash's scaffold may cus
 
 No test runner at launch. Ask before adding one.
 
+## Known upstream gaps
+
+See `docs/emdash-gaps.md` for a running list. Key one: **EmDash admin UI is currently broken** ([emdash-cms/emdash#469](https://github.com/emdash-cms/emdash/issues/469) — `@cloudflare/kumo` Sidebar export). Content authoring happens via `seed/seed.json` + deploy until upstream fixes it. Do not waste cycles trying to "fix" the admin — the bug is in a dep, not our code.
+
 ## Gap-fill posture
 
 EmDash will have gaps. When you (or future Claude) hit one:
