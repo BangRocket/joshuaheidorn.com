@@ -32,13 +32,14 @@ const formatDate = (d: Date | null | undefined) =>
 const primaryEmail = resume.contact?.email ?? "";
 
 const tiles = [
-	{ href: "/resume", label: "Resume", hint: "Experience & skills" },
-	{ href: "/projects", label: "Projects", hint: "Selected work" },
-	{ href: "/posts", label: "Blog", hint: "Notes & writing" },
+	{ href: "/resume", label: "Resume", hint: "Experience & skills", tone: "info" },
+	{ href: "/projects", label: "Projects", hint: "Selected work", tone: "success" },
+	{ href: "/posts", label: "Blog", hint: "Notes & writing", tone: "accent" },
 	{
 		href: primaryEmail ? `mailto:${primaryEmail}` : "#",
 		label: "Contact",
 		hint: primaryEmail || "Get in touch",
+		tone: "default",
 	},
 ];
 ---
@@ -60,7 +61,7 @@ const tiles = [
 
 		<section class="tiles">
 			{tiles.map((t) => (
-				<a class="tile" href={t.href}>
+				<a class="tile" data-tone={t.tone} href={t.href}>
 					<span class="tile-label">{t.label}</span>
 					<span class="tile-hint">{t.hint}</span>
 					<span class="tile-arrow" aria-hidden="true">→</span>
@@ -190,8 +191,14 @@ const tiles = [
 		box-shadow: 4px 4px 0 0 var(--color-border);
 		text-decoration: none;
 		color: var(--color-text);
-		transition: transform 0.12s ease, box-shadow 0.12s ease;
+		transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 	}
+	.tile[data-tone="info"] { background: var(--color-info); }
+	.tile[data-tone="info"]:hover { background: var(--color-info-hover); }
+	.tile[data-tone="success"] { background: var(--color-success); }
+	.tile[data-tone="success"]:hover { background: var(--color-success-hover); }
+	.tile[data-tone="accent"] { background: var(--color-accent); }
+	.tile[data-tone="accent"]:hover { background: var(--color-accent-hover); }
 	.tile:hover {
 		transform: translate(-2px, -2px);
 		box-shadow: 6px 6px 0 0 var(--color-border);
@@ -208,7 +215,13 @@ const tiles = [
 	.tile-hint {
 		font-family: var(--font-sans);
 		font-size: 0.9rem;
-		color: var(--color-muted);
+		color: var(--color-text-secondary);
+	}
+	.tile[data-tone="info"] .tile-hint,
+	.tile[data-tone="success"] .tile-hint,
+	.tile[data-tone="accent"] .tile-hint {
+		color: var(--color-text);
+		opacity: 0.7;
 	}
 	.tile-arrow {
 		position: absolute;

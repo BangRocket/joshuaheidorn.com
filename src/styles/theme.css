@@ -25,6 +25,14 @@
 	--color-on-accent: #000000;
 	--color-accent-ring: color-mix(in srgb, var(--color-accent) 40%, transparent);
 
+	/* Secondary NeoBrutalism accents — saturated and high-contrast with black */
+	--color-info: #5d9cec;
+	--color-info-hover: #3d7fd3;
+	--color-on-info: #000000;
+	--color-success: #7cd992;
+	--color-success-hover: #5cc276;
+	--color-on-success: #000000;
+
 	/* EmDash search widget follows palette */
 	--emdash-search-bg: var(--color-bg);
 	--emdash-search-text: var(--color-text);
@@ -52,4 +60,12 @@ h1, h2, h3, h4, h5, h6 {
 	--color-accent: #ffdb33;
 	--color-accent-hover: #ffcc00;
 	--color-on-accent: #000000;
+
+	/* Dark-mode variants — slightly less saturated so they don't vibrate */
+	--color-info: #7ab5f0;
+	--color-info-hover: #5d9cec;
+	--color-on-info: #000000;
+	--color-success: #95e3a7;
+	--color-success-hover: #7cd992;
+	--color-on-success: #000000;
 }
