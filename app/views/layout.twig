@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% include 'partials/head.twig' %}
+    <script>
+        (function () {
+            var c = document.cookie, i = c.indexOf("theme=");
+            var theme = i >= 0 ? c.slice(i + 6).split(";")[0] : null;
+            if (theme === "dark" || theme === "light") document.documentElement.classList.add(theme);
+            else if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
+        })();
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav">
+            <a href="/" class="site-title">{{ site.siteTitle }}</a>
+            <div class="nav-right">
+                <div data-island="Search" data-props='{{ {"placeholder":"Search...","collections":["posts","projects","pages"]}|json_encode }}'></div>
+                <div class="nav-links">
+                    {% for item in menu %}<a href="{{ item.url }}"{% if item.target %} target="{{ item.target }}"{% endif %}>{{ item.label }}</a>{% endfor %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>{% block content %}{% endblock %}</main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">{{ site.siteTitle }}</a>
+                    <p class="footer-tagline">{{ site.siteTagline }}</p>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">Navigate</h4>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/posts">All Posts</a></li>
+                        {% for page in pages|slice(0, 3) %}<li><a href="/pages/{{ page.slug }}">{{ page.title }}</a></li>{% endfor %}
+                    </ul>
+                </div>
+                <div class="footer-nav">
+                    <h4 class="footer-heading">Connect</h4>
+                    <ul class="footer-links">
+                        {% for item in menu %}<li><a href="{{ item.url }}"{% if item.target %} target="{{ item.target }}" rel="noopener noreferrer"{% endif %}>{{ item.label }}</a></li>{% endfor %}
+                        <li><a href="/posts/rss.xml">Posts RSS</a></li>
+                        <li><a href="/projects/rss.xml">Projects RSS</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copyright">© {{ "now"|date("Y") }} {{ site.siteTitle }}</p>
+                <div class="theme-switcher">
+                    <button type="button" class="theme-btn" data-theme="light" aria-label="Light mode">☀</button>
+                    <button type="button" class="theme-btn" data-theme="dark" aria-label="Dark mode">☾</button>
+                    <button type="button" class="theme-btn" data-theme="system" aria-label="System theme">◐</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var THEME_REGEX = /theme=([^;]+)/;
+            var btns = document.querySelectorAll(".theme-btn"), root = document.documentElement;
+            function setCookie(n, v, age) { age = age || 31536000; var s = location.protocol === "https:" ? "; Secure" : ""; document.cookie = v === "" ? n + "=; path=/; max-age=0; SameSite=Lax" + s : n + "=" + v + "; path=/; max-age=" + age + "; SameSite=Lax" + s; }
+            function active(t) { btns.forEach(function (b) { b.classList.toggle("active", b.dataset.theme === t); }); }
+            function setTheme(t) { if (t === "system") { setCookie("theme", ""); root.classList.remove("light", "dark"); if (window.matchMedia("(prefers-color-scheme: dark)").matches) root.classList.add("dark"); } else { setCookie("theme", t); root.classList.remove("light", "dark"); root.classList.add(t); } active(t); }
+            function stored() { var m = document.cookie.match(THEME_REGEX); return m ? m[1] : "system"; }
+            setTheme(stored());
+            btns.forEach(function (b) { b.addEventListener("click", function () { setTheme(b.dataset.theme || "system"); }); });
+            window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function (e) { if (stored() === "system") root.classList.toggle("dark", e.matches); });
+        })();
+        document.addEventListener("keydown", function (e) { if ((e.metaKey || e.ctrlKey) && e.key === "k") { e.preventDefault(); var i = document.querySelector(".site-search-input"); if (i) i.focus(); } });
+    </script>
+    {% if assets.js('islands/main.js') %}<script type="module" src="{{ assets.js('islands/main.js') }}"></script>{% endif %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>
