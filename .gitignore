@@ -4,3 +4,7 @@ dist
 .wrangler
 uploads
 data.db
+/vendor
+.env
+/public/uploads
+.phpunit.cache
