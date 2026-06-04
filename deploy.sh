@@ -21,14 +21,18 @@ cd "$(dirname "$0")"
 
 [ -f .deploy.env ] && source .deploy.env
 : "${DEPLOY_HOST:?set DEPLOY_HOST (e.g. user@server) in .deploy.env}"
-: "${DEPLOY_PATH:?set DEPLOY_PATH (remote app directory) in .deploy.env}"
+: "${DEPLOY_PATH:?set DEPLOY_PATH (remote app directory, above public_html) in .deploy.env}"
+DEPLOY_PORT="${DEPLOY_PORT:-22}"
+# PHP binary on the host used for Composer + Phinx (the host's default `php` may
+# be too old). e.g. /opt/alt/php82/usr/bin/php on Hostinger.
+PHP_BIN="${PHP_BIN:-php}"
 
 echo "==> Building assets locally"
 yarn install --frozen-lockfile
 yarn build
 
-echo "==> Syncing to ${DEPLOY_HOST}:${DEPLOY_PATH}"
-rsync -az --delete \
+echo "==> Syncing to ${DEPLOY_HOST}:${DEPLOY_PATH} (port ${DEPLOY_PORT})"
+rsync -az --delete -e "ssh -p ${DEPLOY_PORT}" \
   --exclude='.git' \
   --exclude='node_modules' \
   --exclude='vendor' \
@@ -40,6 +44,6 @@ rsync -az --delete \
   ./ "${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
 echo "==> Installing PHP deps + migrating on host"
-ssh "${DEPLOY_HOST}" "cd '${DEPLOY_PATH}' && composer install --no-dev --optimize-autoloader && vendor/bin/phinx migrate -e production"
+ssh -p "${DEPLOY_PORT}" "${DEPLOY_HOST}" "cd '${DEPLOY_PATH}' && ${PHP_BIN} \"\$(command -v composer)\" install --no-dev --optimize-autoloader && ${PHP_BIN} vendor/bin/phinx migrate -e production"
 
 echo "==> Deploy complete."
