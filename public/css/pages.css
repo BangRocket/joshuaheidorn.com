@@ -810,3 +810,19 @@
 	color: var(--color-text-secondary);
 	margin-top: var(--spacing-1);
 }
+
+/* ---------- 404 (ported from 404.astro) ---------- */
+.not-found {
+	text-align: center;
+	padding: var(--spacing-24) var(--spacing-6);
+}
+.not-found h1 {
+	font-size: var(--font-size-5xl);
+	margin-bottom: var(--spacing-2);
+	color: var(--color-border);
+}
+.not-found p {
+	color: var(--color-muted);
+	margin-bottom: var(--spacing-6);
+}
+.not-found a { color: var(--color-text); }

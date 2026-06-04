@@ -49,4 +49,10 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
     $app->get('/search', [$searchCtrl, 'page']);
     $app->get('/api/search', [$searchCtrl, 'api']);
+
+    $sitemapCtrl = new \App\Controllers\SitemapController($posts, $projects, $pages);
+    $errorCtrl = new \App\Controllers\ErrorController($twig, $settings, $pages);
+
+    $app->get('/sitemap.xml', [$sitemapCtrl, 'index']);
+    $app->get('/404', [$errorCtrl, 'notFound']);
 };
