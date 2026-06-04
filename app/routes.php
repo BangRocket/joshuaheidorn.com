@@ -28,6 +28,7 @@ return function ($app, \PDO $pdo, Twig $twig): void {
     $projectCtrl = new \App\Controllers\ProjectController($twig, $projects, $terms, $settings, $pages);
     $pageCtrl = new \App\Controllers\PageController($twig, $pages, $settings);
     $taxonomyCtrl = new \App\Controllers\TaxonomyController($twig, $terms, $settings, $pages);
+    $searchCtrl = new \App\Controllers\SearchController($twig, $search, $settings, $pages);
     $feedCtrl = new \App\Controllers\FeedController($posts, $projects, $settings);
 
     $app->get('/', [$home, 'index']);
@@ -45,4 +46,7 @@ return function ($app, \PDO $pdo, Twig $twig): void {
     $app->get('/pages/{slug}', [$pageCtrl, 'show']);
     $app->get('/tag/{slug}', [$taxonomyCtrl, 'tag']);
     $app->get('/category/{slug}', [$taxonomyCtrl, 'category']);
+
+    $app->get('/search', [$searchCtrl, 'page']);
+    $app->get('/api/search', [$searchCtrl, 'api']);
 };
