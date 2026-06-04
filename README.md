@@ -40,14 +40,17 @@ vendor/bin/phpunit
 
 ## Deploy (shared host with SSH + Composer)
 
-Build locally (`yarn build`), then on the host:
+One-time setup: copy `.deploy.env.example` to `.deploy.env` and set `DEPLOY_HOST` + `DEPLOY_PATH`; point the host's web root at `public/` (`.htaccess` rewrites to `index.php`); create `.env` on the host with production DB + admin credentials.
+
+Then deploy with:
 
 ```bash
-composer install --no-dev
-vendor/bin/phinx migrate -e production
+./deploy.sh
 ```
 
-Point the web root at `public/` (`.htaccess` rewrites to `index.php`). Provide `.env` with DB + admin credentials. Sync `public/uploads/` and `public/assets/`.
+It builds the Svelte islands locally, rsyncs the app (excluding `vendor/`, `.env`, and `public/uploads/`), then runs `composer install --no-dev` and `vendor/bin/phinx migrate -e production` on the host over SSH.
+
+First deploy only — run once on the host afterward: upload the initial `public/uploads/*`, then `php bin/seed.php` (import content) and `php bin/user.php` (create the admin user).
 
 ## Layout
 
