@@ -7,4 +7,5 @@ data.db
 /vendor
 .env
 /public/uploads
+/public/assets
 .phpunit.cache
