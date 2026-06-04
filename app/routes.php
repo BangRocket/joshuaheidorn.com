@@ -24,7 +24,14 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
     $home = new HomeController($twig, $resume, $posts, $projects, $settings, $pages);
     $resumeCtrl = new ResumeController($twig, $resume, $settings, $pages);
+    $postCtrl = new \App\Controllers\PostController($twig, $posts, $terms, $settings, $pages);
+    $feedCtrl = new \App\Controllers\FeedController($posts, $projects, $settings);
 
     $app->get('/', [$home, 'index']);
     $app->get('/resume', [$resumeCtrl, 'show']);
+
+    $app->get('/posts', [$postCtrl, 'index']);
+    $app->get('/posts/rss.xml', [$feedCtrl, 'posts']);
+    $app->get('/projects/rss.xml', [$feedCtrl, 'projects']);
+    $app->get('/posts/{slug}', [$postCtrl, 'show']);
 };
