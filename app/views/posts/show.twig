@@ -1,0 +1,97 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<article class="article">
+    {% if post.image_path %}
+        <div class="article-hero"><img src="{{ post.image_path }}" alt="{{ post.image_alt }}" /></div>
+    {% endif %}
+
+    <div class="article-grid">
+        <aside class="article-meta-col">
+            <div class="meta-sticky">
+                {% if post.published_at %}
+                    <div class="meta-block">
+                        <span class="meta-label">Published</span>
+                        <time class="meta-value">{{ post.published_at|date('F j, Y') }}</time>
+                    </div>
+                {% endif %}
+                <div class="meta-block">
+                    <span class="meta-label">Reading time</span>
+                    <span class="meta-value">{{ readingTime }} min</span>
+                </div>
+                {% if tags is not empty %}
+                    <div class="meta-block">
+                        <span class="meta-label">Tags</span>
+                        <div class="meta-tags">
+                            {% for t in tags %}<a href="/tag/{{ t.slug }}" class="meta-tag">{{ t.label }}</a>{% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </aside>
+
+        <div class="article-main">
+            <header class="article-header">
+                <div class="article-meta">
+                    {% if post.published_at %}<time>{{ post.published_at|date('F j, Y') }}</time><span class="meta-dot"></span>{% endif %}
+                    <span>{{ readingTime }} min read</span>
+                </div>
+                <h1 class="article-title">{{ post.title }}</h1>
+                {% if post.excerpt %}<p class="article-excerpt">{{ post.excerpt }}</p>{% endif %}
+            </header>
+
+            <div class="article-content">{{ bodyHtml|raw }}</div>
+        </div>
+
+        <aside class="article-sidebar">
+            <div class="sidebar-sticky">
+                <nav class="toc" aria-label="Table of contents">
+                    <h4 class="toc-title">On this page</h4>
+                    <div class="toc-content" id="toc-content"></div>
+                </nav>
+            </div>
+        </aside>
+    </div>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function buildToc() {
+        const content = document.querySelector(".article-content");
+        const tocContainer = document.getElementById("toc-content");
+        if (!content || !tocContainer) return;
+        const headings = content.querySelectorAll("h2, h3");
+        if (headings.length === 0) {
+            const toc = document.querySelector(".toc");
+            if (toc) toc.style.display = "none";
+            return;
+        }
+        const list = document.createElement("ul");
+        list.className = "toc-list";
+        headings.forEach((heading, index) => {
+            if (!heading.id) heading.id = `heading-${index}`;
+            const li = document.createElement("li");
+            li.className = heading.tagName === "H3" ? "toc-item toc-item--nested" : "toc-item";
+            const link = document.createElement("a");
+            link.href = `#${heading.id}`;
+            link.className = "toc-link";
+            link.textContent = heading.textContent;
+            li.appendChild(link);
+            list.appendChild(li);
+        });
+        tocContainer.appendChild(list);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                const link = tocContainer.querySelector(`a[href="#${entry.target.id}"]`);
+                if (link && entry.isIntersecting) {
+                    tocContainer.querySelectorAll(".toc-link").forEach((l) => l.classList.remove("active"));
+                    link.classList.add("active");
+                }
+            });
+        }, { rootMargin: "-80px 0px -80% 0px" });
+        headings.forEach((heading) => observer.observe(heading));
+    }
+    buildToc();
+</script>
+{% endblock %}

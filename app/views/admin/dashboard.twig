@@ -1,0 +1,11 @@
+{% extends 'admin/layout.twig' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user }}</h1>
+<div class="admin-cards">
+    <a class="admin-card" href="/admin/posts"><strong>{{ counts.posts }}</strong> Posts</a>
+    <a class="admin-card" href="/admin/projects"><strong>{{ counts.projects }}</strong> Projects</a>
+    <a class="admin-card" href="/admin/pages"><strong>{{ counts.pages }}</strong> Pages</a>
+    <a class="admin-card" href="/admin/media"><strong>{{ counts.media }}</strong> Media</a>
+</div>
+{% endblock %}

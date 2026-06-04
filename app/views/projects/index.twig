@@ -1,0 +1,43 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<main class="projects-page">
+    <header class="page-head">
+        <h1>Projects</h1>
+        <p class="subtitle">Selected work. Case studies are one click in.</p>
+    </header>
+
+    {% if projects is empty %}
+        <section class="empty"><p>No projects yet.</p></section>
+    {% else %}
+        <section class="grid">
+            {% for p in projects %}
+                <article class="project-card">
+                    <a href="/projects/{{ p.slug }}" class="cover-link" aria-label="{{ p.title }}">
+                        {% if p.image_path %}
+                            <div class="cover"><img src="{{ p.image_path }}" alt="{{ p.image_alt }}" loading="lazy" /></div>
+                        {% else %}
+                            <div class="cover placeholder" aria-hidden="true"><span>{{ p.title|first }}</span></div>
+                        {% endif %}
+                    </a>
+                    <div class="body">
+                        <h3 class="title"><a href="/projects/{{ p.slug }}">{{ p.title }}</a></h3>
+                        {% if p.summary %}<p class="summary">{{ p.summary }}</p>{% endif %}
+                        {% if p.tags is not empty %}
+                            <ul class="tags">
+                                {% for t in p.tags %}<li><a href="/projects/tags/{{ t.slug }}" class="tag">{{ t.label }}</a></li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if p.external_url or p.source_url %}
+                            <div class="meta-links">
+                                {% if p.external_url %}<a href="{{ p.external_url }}" target="_blank" rel="noopener noreferrer">Live ↗</a>{% endif %}
+                                {% if p.source_url %}<a href="{{ p.source_url }}" target="_blank" rel="noopener noreferrer">Source ↗</a>{% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    {% endif %}
+</main>
+{% endblock %}

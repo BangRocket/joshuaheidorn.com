@@ -1,0 +1,24 @@
+{% extends 'admin/layout.twig' %}
+{% block title %}{{ cfg.singular }}s{% endblock %}
+{% block content %}
+<div class="admin-toolbar">
+    <h1>{{ cfg.singular }}s</h1>
+    <a class="admin-card" href="/admin/{{ type }}/new">+ New {{ cfg.singular }}</a>
+</div>
+<table class="admin-table">
+    <thead><tr><th>Title</th><th>Slug</th><th>Status</th><th>Published</th><th></th></tr></thead>
+    <tbody>
+        {% for item in items %}
+            <tr>
+                <td><a href="/admin/{{ type }}/{{ item.id }}/edit">{{ item.title }}</a></td>
+                <td>{{ item.slug }}</td>
+                <td>{{ item.status }}</td>
+                <td>{{ item.published_at ? item.published_at|date('Y-m-d') : '—' }}</td>
+                <td><a href="{{ cfg.urlPrefix }}{{ item.slug }}" target="_blank">view ↗</a></td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">None yet.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>{% block title %}Admin{% endblock %} — Admin</title>
+    <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body class="admin">
+    <header class="admin-bar">
+        <a href="/admin" class="admin-brand">Admin</a>
+        <nav class="admin-nav">
+            <a href="/admin/posts">Posts</a>
+            <a href="/admin/projects">Projects</a>
+            <a href="/admin/pages">Pages</a>
+            <a href="/admin/media">Media</a>
+            <a href="/admin/resume">Resume</a>
+            <a href="/admin/settings">Settings</a>
+            <a href="/" target="_blank">View site ↗</a>
+        </nav>
+        <form method="post" action="/admin/logout" class="admin-logout">
+            <button type="submit">Log out</button>
+        </form>
+    </header>
+    <main class="admin-main">{% block content %}{% endblock %}</main>
+</body>
+</html>

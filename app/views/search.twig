@@ -1,0 +1,32 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<section class="search-page">
+    <h1 class="search-title">Search</h1>
+
+    <form method="get" action="/search" class="search-form">
+        <input type="search" name="q" value="{{ query }}" placeholder="Search posts, projects, pages..." class="search-input" autofocus />
+        <button type="submit" class="search-button">Search</button>
+    </form>
+
+    {% if query %}
+        <p class="search-summary">
+            {% if results is empty %}No results for "{{ query }}"{% else %}{{ results|length }} result{{ results|length == 1 ? '' : 's' }} for "{{ query }}"{% endif %}
+        </p>
+    {% endif %}
+
+    {% if results is not empty %}
+        <div class="search-results">
+            {% for r in results %}
+                <a class="search-result" href="{{ r.url }}">
+                    <span class="search-result-title">{{ r.title }}</span>
+                    <span class="search-result-collection">{{ r.collection }}</span>
+                    {% if r.snippet %}<span class="search-result-snippet">{{ r.snippet }}</span>{% endif %}
+                </a>
+            {% endfor %}
+        </div>
+    {% elseif not query %}
+        <p class="search-hint">Enter a search term to find content.</p>
+    {% endif %}
+</section>
+{% endblock %}
