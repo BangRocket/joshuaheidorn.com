@@ -1,67 +1,62 @@
-# EmDash Blog Template (Cloudflare)
+# joshuaheidorn.com
 
-A clean, minimal blog built with [EmDash](https://github.com/emdash-cms/emdash) and deployed on Cloudflare Workers with D1 and R2.
+Personal resume, portfolio, and blog for Joshua Heidorn. **PHP + MySQL** with **Svelte** islands — no Node at runtime.
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/emdash-cms/templates/tree/main/blog-cloudflare)
+## Stack
 
-![Blog template homepage](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-desktop.jpg)
+- **PHP 8.2+ / Slim 4 / PDO (MySQL)** — server runtime
+- **Twig** templates, **league/commonmark** (Markdown), **Dompdf** (PDF resume)
+- **Svelte 5 + Vite** — client islands (typewriter, live search); build-time only
+- **Plain CSS** (NeoBrutalism); **Composer**, **Phinx** (migrations), **PHPUnit**
 
-## What's Included
+## Features
 
-- Featured post hero on the homepage
-- Post archive with reading time estimates
-- Category and tag archives
-- Full-text search
-- RSS feed
-- SEO metadata and JSON-LD
-- Dark/light mode
-- Forms plugin and webhook notifier
+Home, resume (+ `/resume.pdf` download), blog posts, project case studies, standalone pages, tag/category/project-tag archives, live + full-page search, RSS (posts & projects), sitemap, dark/light mode, and a single-user `/admin` for managing everything.
 
-## Pages
+## Local development
 
-| Page | Route |
-|---|---|
-| Homepage | `/` |
-| All posts | `/posts` |
-| Single post | `/posts/:slug` |
-| Category archive | `/category/:slug` |
-| Tag archive | `/tag/:slug` |
-| Search | `/search` |
-| Static pages | `/pages/:slug` |
-| 404 | fallback |
-
-## Screenshots
-
-| | Desktop | Mobile |
-|---|---|---|
-| Light | ![homepage light desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-desktop.jpg) | ![homepage light mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-light-mobile.jpg) |
-| Dark | ![homepage dark desktop](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-desktop.jpg) | ![homepage dark mobile](https://raw.githubusercontent.com/emdash-cms/emdash/main/assets/templates/blog/latest/homepage-dark-mobile.jpg) |
-
-## Infrastructure
-
-- **Runtime:** Cloudflare Workers
-- **Database:** D1
-- **Storage:** R2
-- **Framework:** Astro with `@astrojs/cloudflare`
-
-## Local Development
+Requires Docker (for MySQL), PHP 8.2+, Composer, Node + Yarn.
 
 ```bash
-pnpm install
-pnpm bootstrap
-pnpm dev
+docker compose up -d                       # MySQL on 127.0.0.1:3306
+docker compose exec -T db mysql -uroot -e "CREATE DATABASE IF NOT EXISTS joshuaheidorn_test"
+composer install
+yarn install && yarn build                 # compile Svelte islands
+cp .env.example .env                        # set ADMIN_PASSWORD etc.
+vendor/bin/phinx migrate -e development
+vendor/bin/phinx migrate -e testing
+php bin/seed.php                             # import existing content
+php bin/user.php                             # create the admin user
+php -S 127.0.0.1:8088 -t public public/router.php
 ```
 
-## Deploying
+Visit `http://127.0.0.1:8088/` (site) and `/admin` (login with the credentials from `.env`).
+
+## Tests
 
 ```bash
-pnpm deploy
+vendor/bin/phpunit
 ```
 
-Or click the deploy button above to set up the project in your Cloudflare account.
+## Deploy (shared host with SSH + Composer)
 
-## See Also
+Build locally (`yarn build`), then on the host:
 
-- [Node.js variant](../blog) -- same template using SQLite and local file storage
-- [All templates](../)
-- [EmDash documentation](https://github.com/emdash-cms/emdash/tree/main/docs)
+```bash
+composer install --no-dev
+vendor/bin/phinx migrate -e production
+```
+
+Point the web root at `public/` (`.htaccess` rewrites to `index.php`). Provide `.env` with DB + admin credentials. Sync `public/uploads/` and `public/assets/`.
+
+## Layout
+
+```
+public/      front controller, .htaccess, router (dev), css/, assets/ (built), uploads/
+app/         bootstrap, routes, Controllers/, Repositories/, Support/, Middleware/, views/
+islands/     Svelte components + mount entry
+db/          Phinx migrations
+bin/         seed.php (import), user.php (admin user)
+tests/       PHPUnit
+docs/        design spec + implementation plans
+```
