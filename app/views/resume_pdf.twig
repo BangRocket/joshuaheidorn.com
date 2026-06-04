@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+    * { box-sizing: border-box; }
+    body { font-family: DejaVu Sans, sans-serif; color: #1a1a1a; font-size: 11px; line-height: 1.45; margin: 0; }
+    h1 { font-size: 22px; margin: 0 0 2px; }
+    .headline { color: #444; margin: 0 0 8px; font-size: 12px; }
+    .summary { margin: 0 0 12px; }
+    .contact { margin: 0 0 16px; font-size: 10px; color: #444; }
+    h2 { font-size: 13px; border-bottom: 1px solid #000; padding-bottom: 2px; margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .entry { margin-bottom: 10px; }
+    .entry-head { font-weight: bold; }
+    .entry-meta { color: #555; font-size: 10px; margin-bottom: 3px; }
+    ul { margin: 4px 0 0 16px; padding: 0; }
+    li { margin-bottom: 2px; }
+    .skills-cat { margin-bottom: 6px; }
+    .skills-cat b { display: inline-block; min-width: 110px; }
+</style>
+</head>
+<body>
+    <h1>{{ resume.name }}</h1>
+    {% if resume.headline %}<p class="headline">{{ resume.headline }}</p>{% endif %}
+    {% if resume.summary %}<p class="summary">{{ resume.summary }}</p>{% endif %}
+    <p class="contact">
+        {% if resume.contact.email %}{{ resume.contact.email }}{% endif %}
+        {% if resume.contact.location %} · {{ resume.contact.location }}{% endif %}
+        {% for link in resume.contact.links %} · {{ link.label }}: {{ link.url }}{% endfor %}
+    </p>
+
+    <h2>Experience</h2>
+    {% for job in experience %}
+        <div class="entry">
+            <div class="entry-head">{{ job.role }} · {{ job.company }}</div>
+            <div class="entry-meta">{{ job.start }}{% if job.end %} – {{ job.end }}{% endif %}{% if job.location %} · {{ job.location }}{% endif %}</div>
+            {% if job.bullets %}<ul>{% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+    {% endfor %}
+
+    <h2>Education</h2>
+    {% for ed in education %}
+        <div class="entry">
+            <div class="entry-head">{{ ed.degree }} · {{ ed.school }}</div>
+            <div class="entry-meta">{{ ed.start }}{% if ed.end %} – {{ ed.end }}{% endif %}{% if ed.location %} · {{ ed.location }}{% endif %}</div>
+        </div>
+    {% endfor %}
+
+    <h2>Skills</h2>
+    {% for cat in skills %}
+        <div class="skills-cat"><b>{{ cat.name }}</b> {{ cat.items|map(i => i.name)|join(', ') }}</div>
+    {% endfor %}
+</body>
+</html>

@@ -31,8 +31,11 @@ return function ($app, \PDO $pdo, Twig $twig): void {
     $searchCtrl = new \App\Controllers\SearchController($twig, $search, $settings, $pages);
     $feedCtrl = new \App\Controllers\FeedController($posts, $projects, $settings);
 
+    $pdfCtrl = new \App\Controllers\PdfController($twig, $resume);
+
     $app->get('/', [$home, 'index']);
     $app->get('/resume', [$resumeCtrl, 'show']);
+    $app->get('/resume.pdf', [$pdfCtrl, 'resume']);
 
     $app->get('/posts', [$postCtrl, 'index']);
     $app->get('/posts/rss.xml', [$feedCtrl, 'posts']);
