@@ -1,0 +1,16 @@
+{% extends 'admin/layout.twig' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+{% if saved %}<p class="admin-hint">Saved.</p>{% endif %}
+{% if error %}<p class="admin-error">Invalid menu JSON — nothing was saved.</p>{% endif %}
+<form class="admin-form" method="post" action="/admin/settings">
+    <input type="hidden" name="csrf" value="{{ csrf }}" />
+    <label>Site title<input type="text" name="site_title" value="{{ settings.site_title }}" /></label>
+    <label>Site tagline<input type="text" name="site_tagline" value="{{ settings.site_tagline }}" /></label>
+    <label>Primary menu JSON <span class="admin-hint">([{ label, url, target }])</span>
+        <textarea name="menu" spellcheck="false">{{ menuJson }}</textarea>
+    </label>
+    <div class="admin-actions"><button type="submit">Save</button></div>
+</form>
+{% endblock %}

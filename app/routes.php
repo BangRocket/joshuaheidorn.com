@@ -58,4 +58,38 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
     $app->get('/sitemap.xml', [$sitemapCtrl, 'index']);
     $app->get('/404', [$errorCtrl, 'notFound']);
+
+    // ----- Admin -----
+    $authCtrl = new \App\Controllers\Admin\AuthController($twig, $pdo);
+    $dashCtrl = new \App\Controllers\Admin\DashboardController($twig, $pdo);
+    $contentCtrl = new \App\Controllers\Admin\ContentController($twig, $pdo);
+    $mediaCtrl = new \App\Controllers\Admin\MediaController($twig, $pdo);
+    $adminResumeCtrl = new \App\Controllers\Admin\ResumeController($twig, $pdo);
+    $adminSettingsCtrl = new \App\Controllers\Admin\SettingsController($twig, $pdo);
+
+    $app->group('/admin', function ($group) use ($authCtrl, $dashCtrl, $contentCtrl, $mediaCtrl, $adminResumeCtrl, $adminSettingsCtrl) {
+        $group->get('/login', [$authCtrl, 'loginForm']);
+        $group->post('/login', [$authCtrl, 'login']);
+        $group->post('/logout', [$authCtrl, 'logout']);
+        $group->get('', [$dashCtrl, 'index']);
+
+        foreach (['posts', 'projects', 'pages'] as $type) {
+            $group->get("/{$type}", [$contentCtrl, 'index']);
+            $group->get("/{$type}/new", [$contentCtrl, 'create']);
+            $group->post("/{$type}", [$contentCtrl, 'store']);
+            $group->get("/{$type}/{id}/edit", [$contentCtrl, 'edit']);
+            $group->post("/{$type}/{id}", [$contentCtrl, 'update']);
+            $group->post("/{$type}/{id}/delete", [$contentCtrl, 'destroy']);
+        }
+
+        $group->get('/media', [$mediaCtrl, 'index']);
+        $group->post('/media', [$mediaCtrl, 'upload']);
+        $group->post('/media/{id}/delete', [$mediaCtrl, 'destroy']);
+
+        $group->get('/resume', [$adminResumeCtrl, 'edit']);
+        $group->post('/resume', [$adminResumeCtrl, 'save']);
+
+        $group->get('/settings', [$adminSettingsCtrl, 'edit']);
+        $group->post('/settings', [$adminSettingsCtrl, 'save']);
+    })->add(new \App\Middleware\AuthMiddleware());
 };

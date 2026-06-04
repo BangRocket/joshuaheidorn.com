@@ -40,7 +40,9 @@ $errorMiddleware->setErrorHandler(
 // Light public caching for anonymous GET responses (no edge cache anymore).
 $app->add(function ($request, $handler) {
     $response = $handler->handle($request);
-    if ($request->getMethod() === 'GET' && !str_starts_with($request->getUri()->getPath(), '/api')) {
+    if ($request->getMethod() === 'GET'
+        && !str_starts_with($request->getUri()->getPath(), '/api')
+        && !str_starts_with($request->getUri()->getPath(), '/admin')) {
         return $response->withHeader('Cache-Control', 'public, max-age=300');
     }
     return $response;
