@@ -8,10 +8,8 @@
 			"source_url": "https://github.com/BangRocket/mypalclara",
 			"featured": true,
 			"featured_image": {
-				"src": "/_emdash/api/media/file/01KPYRFEG8J864AZ7VK19E00MX.png",
-				"alt": "",
-				"width": 1024,
-				"height": 1536
+				"src": "/uploads/project-mypalclara.jpg",
+				"alt": "An abstract image of a sphere with dots and lines"
 			},
 			"tags": [
 				"AI",
@@ -68,7 +66,11 @@
 					"heading": "Continuity",
 					"body": "The AI uses set_next_prompt to write direction for its next thought cycle—a self-authored thread of intention. Each thought can set the agenda for the next, maintaining focus across sessions.\n\nWithout this, each thought starts fresh. With it, the AI picks up where it left off, by its own choice. Combined with persistent memory, this creates genuine continuity of purpose across restarts."
 				}
-			]
+			],
+			"featured_image": {
+				"src": "/uploads/project-rumination-engine.jpg",
+				"alt": "A group of cubes that are on a black surface"
+			}
 		},
 		{
 			"slug": "rook",
@@ -97,7 +99,11 @@
 					"heading": "Cognitive Science Background",
 					"body": "Rook applies research from cognitive psychology and neuroscience.\n\nFSRS-6 (Free Spaced Repetition Scheduler): Memories track stability and difficulty. Frequently accessed memories strengthen; unused memories naturally decay following power-law forgetting curves.\n\nPrediction Error Gating: New information is evaluated against existing memories. High prediction error (surprising information) leads to new memory creation; low prediction error (redundant information) is skipped or merged.\n\nSpreading Activation (ACT-R): Related memories activate each other through graph connections. When you search for \"coffee\", memories about \"morning routine\" and \"favorite cafe\" also receive activation boosts."
 				}
-			]
+			],
+			"featured_image": {
+				"src": "/uploads/project-rook.jpg",
+				"alt": "Purple and pink plasma ball"
+			}
 		},
 		{
 			"slug": "kidvid",
@@ -130,7 +136,11 @@
 					"heading": "Architecture",
 					"body": "Kid App: React Native (bare workflow) with react-native-youtube-iframe for playback.\n\nParent Web App: React + Tailwind + shadcn/ui hosted on Firebase.\n\nBackend: Firebase Auth, Cloud Firestore, Cloud Functions (Node.js).\n\nYouTube Integration: Data API v3 for metadata only. All data cached in Firestore so the kid app never hits the API directly."
 				}
-			]
+			],
+			"featured_image": {
+				"src": "/uploads/project-kidvid.jpg",
+				"alt": "Girl sitting on chair"
+			}
 		},
 		{
 			"slug": "toddlersmash",
@@ -163,7 +173,11 @@
 					"heading": "Technical Details",
 					"body": "Built with pi-gen for Raspberry Pi image creation. Python app using pygame for graphics and audio. Overlay filesystem for read-only resilience. Development and tests run on macOS; image builds run on Debian.\n\nFlash to SD card with dd or Raspberry Pi Imager's \"Use Custom Image\" option."
 				}
-			]
+			],
+			"featured_image": {
+				"src": "/uploads/project-toddlersmash.jpg",
+				"alt": "Flat lay photography of circuit board"
+			}
 		},
 		{
 			"slug": "codesmith",
@@ -187,7 +201,11 @@
 					"heading": "Features",
 					"body": "Per-user sessions: Each Discord user gets their own Claude Code session.\n\nReal-time output: Claude Code output streams directly to Discord channels.\n\nStatus embed: Auto-updating pinned embed showing model, tokens, cost, and context usage.\n\nSlash commands: Pass Claude Code commands through Discord (/cc clear, /cc compact, etc.).\n\nDual authentication: Per-user OAuth with Claude Max/Pro subscriptions, or shared API key fallback."
 				}
-			]
+			],
+			"featured_image": {
+				"src": "/uploads/project-codesmith.jpg",
+				"alt": "A computer screen with a bunch of code on it"
+			}
 		}
 	]
 }
