@@ -26,6 +26,8 @@ return function ($app, \PDO $pdo, Twig $twig): void {
     $resumeCtrl = new ResumeController($twig, $resume, $settings, $pages);
     $postCtrl = new \App\Controllers\PostController($twig, $posts, $terms, $settings, $pages);
     $projectCtrl = new \App\Controllers\ProjectController($twig, $projects, $terms, $settings, $pages);
+    $pageCtrl = new \App\Controllers\PageController($twig, $pages, $settings);
+    $taxonomyCtrl = new \App\Controllers\TaxonomyController($twig, $terms, $settings, $pages);
     $feedCtrl = new \App\Controllers\FeedController($posts, $projects, $settings);
 
     $app->get('/', [$home, 'index']);
@@ -37,5 +39,10 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
     $app->get('/projects', [$projectCtrl, 'index']);
     $app->get('/projects/rss.xml', [$feedCtrl, 'projects']);
+    $app->get('/projects/tags/{slug}', [$taxonomyCtrl, 'projectTag']);
     $app->get('/projects/{slug}', [$projectCtrl, 'show']);
+
+    $app->get('/pages/{slug}', [$pageCtrl, 'show']);
+    $app->get('/tag/{slug}', [$taxonomyCtrl, 'tag']);
+    $app->get('/category/{slug}', [$taxonomyCtrl, 'category']);
 };

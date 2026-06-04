@@ -1,0 +1,56 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<section class="archive-section">
+    <header class="archive-header">
+        <span class="archive-label">{{ taxonomyLabel }}</span>
+        <h1 class="archive-title">{{ term.label }}</h1>
+        <p class="archive-count">
+            {{ items|length }}
+            {% if kind == 'project' %}{{ items|length == 1 ? 'project' : 'projects' }}{% else %}{{ items|length == 1 ? 'post' : 'posts' }}{% endif %}
+        </p>
+    </header>
+
+    {% if items is empty %}
+        <p class="no-posts">Nothing here yet.</p>
+    {% else %}
+        <div class="posts-grid">
+            {% for item in items %}
+                {% if kind == 'project' %}
+                    <article class="project-card">
+                        <a href="{{ urlPrefix }}{{ item.slug }}" class="cover-link" aria-label="{{ item.title }}">
+                            {% if item.image_path %}
+                                <div class="cover"><img src="{{ item.image_path }}" alt="{{ item.image_alt }}" loading="lazy" /></div>
+                            {% else %}
+                                <div class="cover placeholder" aria-hidden="true"><span>{{ item.title|first }}</span></div>
+                            {% endif %}
+                        </a>
+                        <div class="body">
+                            <h3 class="title"><a href="{{ urlPrefix }}{{ item.slug }}">{{ item.title }}</a></h3>
+                            {% if item.summary %}<p class="summary">{{ item.summary }}</p>{% endif %}
+                        </div>
+                    </article>
+                {% else %}
+                    <article class="post-card">
+                        <a href="{{ urlPrefix }}{{ item.slug }}" class="card-link">
+                            {% if item.image_path %}
+                                <div class="card-image"><img src="{{ item.image_path }}" alt="{{ item.image_alt }}" /></div>
+                            {% else %}
+                                <div class="card-placeholder"></div>
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="card-meta">
+                                    {% if item.published_at %}<time>{{ item.published_at|date('M j, Y') }}</time><span class="meta-dot"></span>{% endif %}
+                                    <span>{{ item.reading_time }} min</span>
+                                </div>
+                                <h2 class="card-title">{{ item.title }}</h2>
+                                {% if item.excerpt %}<p class="card-excerpt">{{ item.excerpt }}</p>{% endif %}
+                            </div>
+                        </a>
+                    </article>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
