@@ -1,0 +1,28 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<article class="case-study">
+    <header class="cs-head">
+        <a href="/projects" class="back">← All projects</a>
+        <h1>{{ project.title }}</h1>
+        {% if project.summary %}<p class="lede">{{ project.summary }}</p>{% endif %}
+        {% if tags is not empty %}
+            <ul class="chips">
+                {% for t in tags %}<li><a href="/projects/tags/{{ t.slug }}" class="chip">{{ t.label }}</a></li>{% endfor %}
+            </ul>
+        {% endif %}
+        {% if project.external_url or project.source_url %}
+            <div class="meta-links">
+                {% if project.external_url %}<a href="{{ project.external_url }}" target="_blank" rel="noopener noreferrer">Live ↗</a>{% endif %}
+                {% if project.source_url %}<a href="{{ project.source_url }}" target="_blank" rel="noopener noreferrer">Source ↗</a>{% endif %}
+            </div>
+        {% endif %}
+    </header>
+
+    {% if project.image_path %}
+        <figure class="hero"><img src="{{ project.image_path }}" alt="{{ project.image_alt }}" /></figure>
+    {% endif %}
+
+    <div class="body">{{ bodyHtml|raw }}</div>
+</article>
+{% endblock %}
