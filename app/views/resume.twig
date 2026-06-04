@@ -1,0 +1,75 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<main class="resume">
+    <header class="intro">
+        <h1 class="resume-name">{{ resume.name }}</h1>
+        {% if resume.headline %}<p class="resume-headline">{{ resume.headline }}</p>{% endif %}
+        {% if resume.summary %}<p class="resume-summary">{{ resume.summary }}</p>{% endif %}
+        <ul class="links">
+            {% if resume.contact.email %}<li><a href="mailto:{{ resume.contact.email }}">{{ resume.contact.email }}</a></li>{% endif %}
+            {% if resume.contact.location %}<li>{{ resume.contact.location }}</li>{% endif %}
+            {% for l in resume.contact.links %}<li><a href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ l.label }}</a></li>{% endfor %}
+            <li><a href="/resume.pdf" class="resume-pdf-link">Download PDF</a></li>
+        </ul>
+    </header>
+
+    {% if experience is not empty %}
+    <section>
+        <h2>Experience</h2>
+        <ol class="entries">
+            {% for job in experience %}
+                <li class="entry">
+                    <div class="entry-head">
+                        <span class="entry-role">{{ job.role }}</span>
+                        <span class="entry-sep">·</span>
+                        <span class="entry-company">{{ job.company }}</span>
+                        <span class="entry-range">{{ job.start }}{% if job.end %} – {{ job.end }}{% endif %}</span>
+                    </div>
+                    {% if job.location %}<p class="entry-location">{{ job.location }}</p>{% endif %}
+                    {% if job.bullets is not empty %}
+                        <ul class="entry-bullets">{% for b in job.bullets %}<li>{{ b }}</li>{% endfor %}</ul>
+                    {% endif %}
+                    {% if job.tags is not empty %}
+                        <ul class="chips">{% for t in job.tags %}<li class="chip">{{ t }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </section>
+    {% endif %}
+
+    {% if education is not empty %}
+    <section>
+        <h2>Education</h2>
+        <ol class="entries">
+            {% for ed in education %}
+                <li class="entry">
+                    <div class="entry-head">
+                        <span class="entry-role">{{ ed.degree }}</span>
+                        <span class="entry-sep">·</span>
+                        <span class="entry-company">{{ ed.school }}</span>
+                        <span class="entry-range">{{ ed.start }}{% if ed.end %} – {{ ed.end }}{% endif %}</span>
+                    </div>
+                    {% if ed.location %}<p class="entry-location">{{ ed.location }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    </section>
+    {% endif %}
+
+    {% if skills is not empty %}
+    <section>
+        <h2>Skills</h2>
+        <div class="skill-cats">
+            {% for cat in skills %}
+                <div class="skill-cat">
+                    <h3>{{ cat.name }}</h3>
+                    <ul class="chips">{% for item in cat.items %}<li class="chip">{{ item.name }}</li>{% endfor %}</ul>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<main class="home">
+    <section class="hero">
+        <p class="eyebrow">Hello,</p>
+        <h1 class="name">I'm {{ resume.name }}.</h1>
+        <p class="headline">
+            {% if resume.headlines is not empty %}
+                <span data-island="Typewriter" data-props='{{ {"phrases": resume.headlines}|json_encode }}'>{{ resume.headlines[0] }}</span>
+            {% else %}
+                {{ resume.headline }}
+            {% endif %}
+        </p>
+        {% if resume.summary %}<p class="summary">{{ resume.summary }}</p>{% endif %}
+    </section>
+
+    <section class="tiles">
+        {% for t in tiles %}
+            <a class="tile" href="{{ t.href }}">
+                <span class="tile-label">{{ t.label }}</span>
+                <span class="tile-hint">{{ t.hint }}</span>
+                <span class="tile-arrow" aria-hidden="true">→</span>
+            </a>
+        {% endfor %}
+    </section>
+
+    {% if featuredProjects is not empty %}
+    <section class="strip">
+        <header class="strip-header">
+            <h2>Featured projects</h2>
+            <a href="/projects">All projects →</a>
+        </header>
+        <ul class="strip-list">
+            {% for p in featuredProjects %}
+                <li>
+                    <a href="/projects/{{ p.slug }}" class="strip-item">
+                        <span class="strip-title">{{ p.title }}</span>
+                        {% if p.summary %}<span class="strip-summary">{{ p.summary }}</span>{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if recentPosts is not empty %}
+    <section class="strip">
+        <header class="strip-header">
+            <h2>Recent writing</h2>
+            <a href="/posts">All posts →</a>
+        </header>
+        <ul class="strip-list">
+            {% for post in recentPosts %}
+                <li>
+                    <a href="/posts/{{ post.slug }}" class="strip-item">
+                        <span class="strip-title">{{ post.title ?? 'Untitled' }}</span>
+                        {% if post.published_at %}<time class="strip-date">{{ post.published_at|date('M j, Y') }}</time>{% endif %}
+                        {% if post.excerpt %}<span class="strip-summary">{{ post.excerpt }}</span>{% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+</main>
+{% endblock %}
