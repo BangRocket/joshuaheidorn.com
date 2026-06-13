@@ -12,6 +12,8 @@ final class Auth
     public static function start(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
+            // Refuse attacker-supplied session IDs (fixation defense).
+            ini_set('session.use_strict_mode', '1');
             session_set_cookie_params([
                 'httponly' => true,
                 'samesite' => 'Lax',
@@ -26,6 +28,10 @@ final class Auth
         $user = (new UserRepository($pdo))->findByEmail($email);
         if (!$user || !password_verify($password, $user['password_hash'])) {
             return false;
+        }
+        // Rotate the session ID at the privilege boundary (fixation defense).
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
         }
         $_SESSION['uid'] = (int) $user['id'];
         $_SESSION['uname'] = $user['name'];
