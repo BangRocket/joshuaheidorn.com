@@ -57,9 +57,10 @@ The `users` table is left **dormant** (its migration is untouched).
 
 Run:
 ```bash
-composer require clerk/clerk-sdk-php
+composer require clerkinc/backend-php
 ```
-Expected: composer adds `clerk/clerk-sdk-php` to `require` and writes `composer.lock`. Verify the namespace exists:
+(The GitHub repo is `clerk/clerk-sdk-php`, but its Packagist package name is `clerkinc/backend-php` — Clerk's official SDK published under the legacy `clerkinc` vendor; same `Clerk\Backend\` namespace.)
+Expected: composer adds `clerkinc/backend-php` to `require` and writes `composer.lock`. Verify the namespace exists:
 ```bash
 ls vendor/clerk/clerk-sdk-php/src/Helpers/Jwks/AuthenticateRequest.php
 ```
