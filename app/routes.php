@@ -13,7 +13,7 @@ use App\Repositories\SettingsRepository;
 use App\Repositories\TermRepository;
 use Slim\Views\Twig;
 
-return function ($app, \PDO $pdo, Twig $twig): void {
+return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth): void {
     $posts = new PostRepository($pdo);
     $projects = new ProjectRepository($pdo);
     $pages = new PageRepository($pdo);
@@ -69,8 +69,6 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
     $app->group('/admin', function ($group) use ($authCtrl, $dashCtrl, $contentCtrl, $mediaCtrl, $adminResumeCtrl, $adminSettingsCtrl) {
         $group->get('/login', [$authCtrl, 'loginForm']);
-        $group->post('/login', [$authCtrl, 'login']);
-        $group->post('/logout', [$authCtrl, 'logout']);
         $group->get('', [$dashCtrl, 'index']);
 
         foreach (['posts', 'projects', 'pages'] as $type) {
@@ -91,5 +89,5 @@ return function ($app, \PDO $pdo, Twig $twig): void {
 
         $group->get('/settings', [$adminSettingsCtrl, 'edit']);
         $group->post('/settings', [$adminSettingsCtrl, 'save']);
-    })->add(new \App\Middleware\AuthMiddleware());
+    })->add(new \App\Middleware\AuthMiddleware($clerkAuth));
 };
