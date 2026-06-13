@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-use App\Repositories\UserRepository;
-use PDO;
-
+/**
+ * PHP session bootstrap. Identity is now owned by Clerk (see ClerkAuth);
+ * the PHP session survives only to back CSRF tokens (see Csrf).
+ */
 final class Auth
 {
     public static function start(): void
@@ -20,34 +21,6 @@ final class Auth
                 'secure' => ($_SERVER['HTTPS'] ?? '') !== '',
             ]);
             session_start();
-        }
-    }
-
-    public static function attempt(PDO $pdo, string $email, string $password): bool
-    {
-        $user = (new UserRepository($pdo))->findByEmail($email);
-        if (!$user || !password_verify($password, $user['password_hash'])) {
-            return false;
-        }
-        // Rotate the session ID at the privilege boundary (fixation defense).
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_regenerate_id(true);
-        }
-        $_SESSION['uid'] = (int) $user['id'];
-        $_SESSION['uname'] = $user['name'];
-        return true;
-    }
-
-    public static function check(): bool
-    {
-        return !empty($_SESSION['uid']);
-    }
-
-    public static function logout(): void
-    {
-        $_SESSION = [];
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_destroy();
         }
     }
 }

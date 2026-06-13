@@ -60,7 +60,7 @@ return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth)
     $app->get('/404', [$errorCtrl, 'notFound']);
 
     // ----- Admin -----
-    $authCtrl = new \App\Controllers\Admin\AuthController($twig, $pdo);
+    $authCtrl = new \App\Controllers\Admin\AuthController($twig);
     $dashCtrl = new \App\Controllers\Admin\DashboardController($twig, $pdo);
     $contentCtrl = new \App\Controllers\Admin\ContentController($twig, $pdo);
     $mediaCtrl = new \App\Controllers\Admin\MediaController($twig, $pdo);
