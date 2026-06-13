@@ -606,10 +606,14 @@ Create `islands/AdminLogin.svelte`:
 
 ```svelte
 <script>
-    import { ClerkProvider } from "svelte-clerk/client";
-    import { SignIn } from "svelte-clerk";
+    import { ClerkProvider, SignIn } from "svelte-clerk/client";
 
     let { publishableKey } = $props();
+
+    // A missing key would render a blank, non-functional sign-in — fail loudly.
+    if (!publishableKey) {
+        console.error("[AdminLogin] missing publishableKey (CLERK_PUBLISHABLE_KEY)");
+    }
 </script>
 
 <ClerkProvider {publishableKey}>
@@ -619,16 +623,22 @@ Create `islands/AdminLogin.svelte`:
 </ClerkProvider>
 ```
 
+> Verified during implementation: `SignIn`/`UserButton`/`ClerkProvider` must all be imported from **`svelte-clerk/client`** (the pure-Svelte-5 exports). The package **root** (`svelte-clerk`) re-exports SvelteKit-only versions (they import `$app/state`/`$app/navigation`) which break a plain Vite build.
+
 - [ ] **Step 5: Create the user-button island**
 
 Create `islands/AdminUserButton.svelte`:
 
 ```svelte
 <script>
-    import { ClerkProvider } from "svelte-clerk/client";
-    import { UserButton } from "svelte-clerk";
+    import { ClerkProvider, UserButton } from "svelte-clerk/client";
 
     let { publishableKey } = $props();
+
+    // A missing key would render a blank, non-functional control — fail loudly.
+    if (!publishableKey) {
+        console.error("[AdminUserButton] missing publishableKey (CLERK_PUBLISHABLE_KEY)");
+    }
 </script>
 
 <ClerkProvider {publishableKey}>
