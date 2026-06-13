@@ -22,7 +22,7 @@ $twig->getEnvironment()->addGlobal('clerk_pk', $config['clerk']['publishable_key
 
 $clerkAuth = new ClerkAuth(
     $config['clerk']['secret_key'],
-    [$config['clerk']['app_url']],
+    ClerkAuth::parseAuthorizedParties($config['clerk']['app_url']),
     $config['clerk']['admin_user_id'],
 );
 

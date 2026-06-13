@@ -37,4 +37,28 @@ final class ClerkAuthTest extends TestCase
     {
         $this->assertFalse(ClerkAuth::decide(true, '', 'user_abc'));
     }
+
+    public function test_parse_authorized_parties_single_origin(): void
+    {
+        $this->assertSame(
+            ['http://127.0.0.1:8088'],
+            ClerkAuth::parseAuthorizedParties('http://127.0.0.1:8088')
+        );
+    }
+
+    public function test_parse_authorized_parties_splits_and_trims(): void
+    {
+        $this->assertSame(
+            ['http://127.0.0.1:8088', 'http://localhost:8088'],
+            ClerkAuth::parseAuthorizedParties('http://127.0.0.1:8088, http://localhost:8088')
+        );
+    }
+
+    public function test_parse_authorized_parties_drops_empty_entries(): void
+    {
+        $this->assertSame(
+            ['https://example.com'],
+            ClerkAuth::parseAuthorizedParties('https://example.com,, ')
+        );
+    }
 }
