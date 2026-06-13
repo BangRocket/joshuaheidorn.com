@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>{% block title %}Admin{% endblock %} — Admin</title>
     <link rel="stylesheet" href="/css/admin.css" />
+    {% for href in assets.css('islands/admin.js') %}<link rel="stylesheet" href="{{ href }}" />{% endfor %}
 </head>
 <body class="admin">
     <header class="admin-bar">
@@ -19,10 +20,9 @@
             <a href="/admin/settings">Settings</a>
             <a href="/" target="_blank">View site ↗</a>
         </nav>
-        <form method="post" action="/admin/logout" class="admin-logout">
-            <button type="submit">Log out</button>
-        </form>
+        <div class="admin-user" data-island="AdminUserButton" data-props='{{ {"publishableKey": clerk_pk}|json_encode }}'></div>
     </header>
     <main class="admin-main">{% block content %}{% endblock %}</main>
+    {% if assets.js('islands/admin.js') %}<script type="module" src="{{ assets.js('islands/admin.js') }}"></script>{% endif %}
 </body>
 </html>
