@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Support\AssetManifest;
+use App\Support\ClerkAuth;
 use App\Support\Database;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -17,11 +18,18 @@ $twig = Twig::create(__DIR__ . '/views', ['cache' => false, 'autoescape' => 'htm
 $assets = new AssetManifest($config['paths']['base'] . '/public/assets');
 
 $twig->getEnvironment()->addGlobal('assets', $assets);
+$twig->getEnvironment()->addGlobal('clerk_pk', $config['clerk']['publishable_key']);
+
+$clerkAuth = new ClerkAuth(
+    $config['clerk']['secret_key'],
+    [$config['clerk']['app_url']],
+    $config['clerk']['admin_user_id'],
+);
 
 $app = AppFactory::create();
 $app->add(TwigMiddleware::create($app, $twig));
 
-(require __DIR__ . '/routes.php')($app, $pdo, $twig);
+(require __DIR__ . '/routes.php')($app, $pdo, $twig, $clerkAuth);
 
 // Render the 404 template for unmatched routes.
 $errorMiddleware = $app->addErrorMiddleware(false, true, true);

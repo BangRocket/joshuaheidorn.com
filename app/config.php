@@ -31,4 +31,10 @@ return [
         'uploads_src' => $root . '/uploads',
         'uploads_dest' => $root . '/public/uploads',
     ],
+    'clerk' => [
+        'publishable_key' => $_ENV['CLERK_PUBLISHABLE_KEY'] ?? '',
+        'secret_key' => $_ENV['CLERK_SECRET_KEY'] ?? '',
+        'admin_user_id' => $_ENV['ADMIN_CLERK_USER_ID'] ?? '',
+        'app_url' => $_ENV['APP_URL'] ?? 'http://127.0.0.1:8088',
+    ],
 ];

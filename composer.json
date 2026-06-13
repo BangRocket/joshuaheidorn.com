@@ -4,6 +4,7 @@
     "type": "project",
     "require": {
         "php": ">=8.2",
+        "clerkinc/backend-php": "^1.0",
         "dompdf/dompdf": "^3.0",
         "league/commonmark": "^2.4",
         "robmorgan/phinx": "^0.16",
