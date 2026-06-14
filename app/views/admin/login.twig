@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <title>Log in — Admin</title>
+    <script>
+        (function () {
+            var c = document.cookie, i = c.indexOf("theme=");
+            var theme = i >= 0 ? c.slice(i + 6).split(";")[0] : null;
+            if (theme === "dark" || theme === "light") document.documentElement.classList.add(theme);
+            else if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/theme.css" />
     <link rel="stylesheet" href="/css/admin.css" />
     {% for href in assets.css('islands/admin.js') %}<link rel="stylesheet" href="{{ href }}" />{% endfor %}
 </head>
