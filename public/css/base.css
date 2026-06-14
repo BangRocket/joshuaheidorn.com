@@ -117,8 +117,8 @@
 		--tag-padding-y: 2px;
 
 		/* Shadows */
-		--shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.12);
-		--shadow-btn-active: 0 1px 2px rgba(0, 0, 0, 0.05);
+		--shadow-dropdown: var(--shadow);
+		--shadow-btn-active: var(--shadow-hover);
 	}
 
 	html {
