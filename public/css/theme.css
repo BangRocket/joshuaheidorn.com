@@ -45,17 +45,25 @@ h1, h2, h3, h4, h5, h6 {
 	letter-spacing: 2px;
 }
 
+/*
+  Dark palette adapted from caresome/filament-neobrutalism-theme
+  (https://github.com/caresome/filament-neobrutalism-theme). The earlier dark
+  mode put pure-white borders + white offset shadows on near-black, which read
+  as harsh. The filament theme instead uses a mid-gray (Tailwind zinc-600
+  #52525b) for borders/shadows over a zinc background — still clearly
+  NeoBrutalist, far less intense.
+*/
 :root.dark {
-	--color-bg: #1e1e1e;            /* cards */
-	--color-bg-subtle: #121212;     /* page */
-	--color-text: #f5f5f5;
-	--color-text-secondary: #c0c0c0;
-	--color-muted: #909090;
-	--color-border: #f5f5f5;        /* light borders */
-	--color-border-subtle: #444444;
-	--color-surface: #2a2a2a;
+	--color-bg: #27272a;            /* cards (zinc-800) */
+	--color-bg-subtle: #18181b;     /* page (zinc-900) */
+	--color-text: #f4f4f5;          /* zinc-100 */
+	--color-text-secondary: #d4d4d8;/* zinc-300 */
+	--color-muted: #a1a1aa;         /* zinc-400 */
+	--color-border: #52525b;        /* zinc-600 — soft mid-gray, not white */
+	--color-border-subtle: #3f3f46; /* zinc-700 hairlines */
+	--color-surface: #323238;       /* raised gray panel */
 	--color-accent: #facc15;
 	--color-accent-hover: #eab308;
 	--color-on-accent: #000000;
-	/* --color-shadow inherits var(--color-border) → light offset on dark */
+	/* --color-shadow inherits var(--color-border) → mid-gray offset, not white */
 }
