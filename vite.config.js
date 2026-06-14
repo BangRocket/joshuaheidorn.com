@@ -16,6 +16,7 @@ export default defineConfig({
             input: {
                 main: "islands/main.js",
                 admin: "islands/admin.js",
+                jobs: "islands/jobs.js",
             },
         },
     },
