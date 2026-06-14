@@ -27,6 +27,7 @@ $clerkAuth = new ClerkAuth(
 );
 
 $app = AppFactory::create();
+$app->addBodyParsingMiddleware();
 $app->add(TwigMiddleware::create($app, $twig));
 
 (require __DIR__ . '/routes.php')($app, $pdo, $twig, $clerkAuth);
@@ -50,7 +51,8 @@ $app->add(function ($request, $handler) {
     $response = $handler->handle($request);
     if ($request->getMethod() === 'GET'
         && !str_starts_with($request->getUri()->getPath(), '/api')
-        && !str_starts_with($request->getUri()->getPath(), '/admin')) {
+        && !str_starts_with($request->getUri()->getPath(), '/admin')
+        && !str_starts_with($request->getUri()->getPath(), '/jobs')) {
         return $response->withHeader('Cache-Control', 'public, max-age=300');
     }
     return $response;

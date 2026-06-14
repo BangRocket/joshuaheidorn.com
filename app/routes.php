@@ -59,6 +59,13 @@ return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth)
     $app->get('/sitemap.xml', [$sitemapCtrl, 'index']);
     $app->get('/404', [$errorCtrl, 'notFound']);
 
+    // ----- Job Tracker -----
+    $jobCtrl = new \App\Controllers\JobController(
+        $twig,
+        new \App\Repositories\JobRepository($pdo),
+        new \App\Repositories\JobSettingsRepository($pdo),
+    );
+
     // ----- Admin -----
     $authCtrl = new \App\Controllers\Admin\AuthController($twig);
     $dashCtrl = new \App\Controllers\Admin\DashboardController($twig, $pdo);
@@ -89,5 +96,15 @@ return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth)
 
         $group->get('/settings', [$adminSettingsCtrl, 'edit']);
         $group->post('/settings', [$adminSettingsCtrl, 'save']);
+    })->add(new \App\Middleware\AuthMiddleware($clerkAuth));
+
+    $app->group('/jobs', function ($group) use ($jobCtrl) {
+        $group->get('', [$jobCtrl, 'page']);
+        $group->get('/api/jobs', [$jobCtrl, 'list']);
+        $group->post('/api/jobs', [$jobCtrl, 'store']);
+        $group->put('/api/jobs/{id}', [$jobCtrl, 'update']);
+        $group->delete('/api/jobs/{id}', [$jobCtrl, 'destroy']);
+        $group->get('/api/settings', [$jobCtrl, 'getSettings']);
+        $group->put('/api/settings', [$jobCtrl, 'saveSettings']);
     })->add(new \App\Middleware\AuthMiddleware($clerkAuth));
 };
