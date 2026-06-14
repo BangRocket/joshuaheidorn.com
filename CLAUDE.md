@@ -12,7 +12,7 @@ Personal resume / portfolio / blog site for Joshua Heidorn (joshuaheidorn.com). 
 - **Twig** (`slim/twig-view`) templates, auto-escaping on.
 - **league/commonmark** — Markdown (post/project/page bodies) → HTML at request time.
 - **dompdf/dompdf** — on-demand PDF resume at `/resume.pdf` (pure PHP, no headless browser).
-- **Svelte 5 + Vite** — client islands (`Typewriter`, `Search` public; `AdminLogin`, `AdminUserButton` admin-only), compiled to hashed bundles in `public/assets/` (public `islands/main.js` + admin `islands/admin.js`, emitted as separate Vite entries). **Node is build-time only.**
+- **Svelte 5 + Vite** — client islands (`Typewriter`, `Search` public; `AdminLogin`, `AdminUserButton` admin-only; `JobTracker` (the `/jobs` app)), compiled to hashed bundles in `public/assets/` (public `islands/main.js` + admin `islands/admin.js` + jobs `islands/jobs.js`, emitted as separate Vite entries). **Node is build-time only.**
 - **Plain CSS** in `public/css/` (`theme.css` palette + `base.css` tokens + `layout.css`/`pages.css`/`article.css`). NeoBrutalism look (yellow `#ffdb33`, black borders, offset shadows, Archivo Black). No Tailwind.
 - **Composer** (deps), **Phinx** (`db/migrations/`), **vlucas/phpdotenv** (`.env`), **PHPUnit** (PHP tests), **Vitest + jsdom** (Svelte island tests).
 - **Clerk** (`clerkinc/backend-php` backend SDK + `svelte-clerk` client island) — admin identity provider. PHP verifies the Clerk `__session` cookie networklessly; sign-in/account UI is an admin-only Svelte island. Clerk JS loads only on `/admin` pages.
@@ -27,8 +27,8 @@ Personal resume / portfolio / blog site for Joshua Heidorn (joshuaheidorn.com). 
 ## Architecture
 
 - **Front controller:** `public/index.php` → `app/bootstrap.php` builds the Slim app (PDO, Twig, asset manifest, routes, 404 handler, public cache middleware) and returns it.
-- **Routes:** `app/routes.php` — public routes plus a Clerk-guarded `/admin` group (`AuthMiddleware`).
-- **Controllers** (`app/Controllers/`, admin under `app/Controllers/Admin/`) are thin; **repositories** (`app/Repositories/`) own all SQL via PDO; **support** utilities (`app/Support/`): `Database`, `Slug`, `Markdown`, `PortableText`, `ReadingTime`, `SiteIdentity`, `Seo`, `AssetManifest`, `Auth` (session bootstrap for CSRF), `ClerkAuth` (Clerk session verification + single-admin allowlist), `Csrf`, `Importer`.
+- **Routes:** `app/routes.php` — public routes plus a Clerk-guarded `/admin` group (`AuthMiddleware`) and a Clerk-guarded `/jobs` group (`JobController` → `JobRepository`/`JobSettingsRepository`); the Job Tracker SPA lives in `islands/jobtracker/`.
+- **Controllers** (`app/Controllers/`, admin under `app/Controllers/Admin/`) are thin; **repositories** (`app/Repositories/`) own all SQL via PDO; **support** utilities (`app/Support/`): `Database`, `Slug`, `Markdown`, `PortableText`, `ReadingTime`, `SiteIdentity`, `Seo`, `AssetManifest`, `Auth` (session bootstrap for CSRF), `ClerkAuth` (Clerk session verification + single-admin allowlist), `Csrf`, `Importer`, `ValidationException` (repo input validation → JSON 400).
 - **Templates:** `app/views/` (public) + `app/views/admin/`. `layout.twig` owns the public chrome (nav, footer, theme switcher, search island, ⌘K). Assets are emitted via the Vite manifest helper (`assets.js()/assets.css()`).
 - **Namespacing:** PSR-4 `App\` → `app/`, `Tests\` → `tests/`.
 
@@ -36,7 +36,7 @@ Personal resume / portfolio / blog site for Joshua Heidorn (joshuaheidorn.com). 
 
 All content lives in **MySQL** and is editable through the `/admin` UI:
 
-- **Tables:** `posts`, `projects`, `pages` (Markdown bodies); `terms` + `term_relationships` (taxonomy: `tag`/`category`, polymorphic `content_type`); `media`; `resume_meta`/`experience`/`education`; `skill_categories`/`skills`; `settings`; `menu_items`; `users`.
+- **Tables:** `posts`, `projects`, `pages` (Markdown bodies); `terms` + `term_relationships` (taxonomy: `tag`/`category`, polymorphic `content_type`); `media`; `resume_meta`/`experience`/`education`; `skill_categories`/`skills`; `settings`; `menu_items`; `users`; `jobs` + `job_settings` (Job Tracker).
 - **Editing:** posts/projects/pages via CRUD forms (one generic `ContentController` + config); tags/categories inline (comma-separated, synced to `terms`); resume/skills/settings via validated **JSON-document** editors that rewrite the normalized tables.
 - **Migration sources (kept in repo):** `seed/seed.json` (posts/pages/taxonomy/menu/settings), `src/data/{projects,resume,skills}.json` (+ `*.schema.json`), `uploads/*`. The one-time importer (`bin/seed.php` → `App\Support\Importer`) loads them, converting EmDash Portable Text → Markdown.
 
@@ -67,3 +67,7 @@ Build locally (`yarn build`), then on the host: pull/rsync → `composer install
 ## Out of scope for v1
 
 Comments, multi-user auth, analytics, i18n. Resume/skills repeatable-row form UIs (JSON editor is the current path). Clerk handles login brute-force/rate-limiting. Dropping the now-dormant `users` table is a deferred follow-up.
+
+## Job Tracker
+
+The standalone Job Tracker app (`public/jobs` / `jobs.joshuaheidorn.com`, SQLite + Basic Auth) is **retired**. Job tracking is now the integrated `/jobs` section: a Clerk-gated page + JSON API (`/jobs/api/...`) backed by the `jobs`/`job_settings` MySQL tables, with the Svelte SPA in `islands/jobtracker/` reskinned to the site's NeoBrutalism look and dark mode via the site's theme switcher. The `deploy.sh` `rsync --delete` exclusion for `public/jobs` is now legacy/harmless.
