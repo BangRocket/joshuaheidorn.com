@@ -121,36 +121,6 @@
 		--shadow-btn-active: 0 1px 2px rgba(0, 0, 0, 0.05);
 	}
 
-	/* Dark mode via system preference (when no explicit class) */
-	@media (prefers-color-scheme: dark) {
-		:root:not(.light) {
-			--color-bg: #0d0d0d;
-			--color-bg-subtle: #141414;
-			--color-text: #ededed;
-			--color-text-secondary: #a0a0a0;
-			--color-muted: #6b6b6b;
-			--color-border: #2a2a2a;
-			--color-border-subtle: #1f1f1f;
-			--color-surface: #181818;
-			--color-accent: #4d9fff;
-			--color-accent-hover: #6eb0ff;
-		}
-	}
-
-	/* Explicit dark mode */
-	:root.dark {
-		--color-bg: #0d0d0d;
-		--color-bg-subtle: #141414;
-		--color-text: #ededed;
-		--color-text-secondary: #a0a0a0;
-		--color-muted: #6b6b6b;
-		--color-border: #2a2a2a;
-		--color-border-subtle: #1f1f1f;
-		--color-surface: #181818;
-		--color-accent: #4d9fff;
-		--color-accent-hover: #6eb0ff;
-	}
-
 	html {
 		scroll-behavior: smooth;
 	}

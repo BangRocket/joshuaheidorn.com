@@ -46,17 +46,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 :root.dark {
-	--color-bg: #1a1a1a;
-	--color-bg-subtle: #242424;
+	--color-bg: #1e1e1e;            /* cards */
+	--color-bg-subtle: #121212;     /* page */
 	--color-text: #f5f5f5;
-	--color-text-secondary: #d4d4d4;
-	--color-muted: #a0a0a0;
-	--color-border: #f5f5f5;
-	--color-border-subtle: #3a3a3a;
-	--color-surface: #3a3a3a;
-	--color-accent: #ffdb33;
-	--color-accent-hover: #ffcc00;
+	--color-text-secondary: #c0c0c0;
+	--color-muted: #909090;
+	--color-border: #f5f5f5;        /* light borders */
+	--color-border-subtle: #444444;
+	--color-surface: #2a2a2a;
+	--color-accent: #facc15;
+	--color-accent-hover: #eab308;
 	--color-on-accent: #000000;
-
-	--color-shadow: var(--color-accent);
+	/* --color-shadow inherits var(--color-border) → light offset on dark */
 }
