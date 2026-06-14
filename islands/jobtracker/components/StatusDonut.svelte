@@ -30,7 +30,7 @@
   <h3>Status breakdown</h3>
   <div class="donut-row">
     <div class="donut" style="background:{data.bg}">
-      <div class="hole"><div><b>{data.total}</b><span>tracked</span></div></div>
+      <div class="hole"><div><b>{data.total}</b></div></div>
     </div>
     <div class="legend">
       {#if data.legend.length}
