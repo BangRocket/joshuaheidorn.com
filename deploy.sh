@@ -3,10 +3,12 @@
 # One-command deploy to the shared host.
 #
 #   - Builds the Svelte islands locally (the host has no Node).
-#   - rsyncs the app to the host (vendor + .env + public/uploads are NOT synced:
-#     vendor is rebuilt on the host, .env lives only on the host, and
-#     public/uploads is owned by the admin on the host — clobbering it would
-#     delete media uploaded through /admin/media).
+#   - rsyncs the app to the host (vendor + .env + public/uploads + public/jobs
+#     are NOT synced: vendor is rebuilt on the host, .env lives only on the host,
+#     public/uploads is owned by the admin on the host (clobbering it would
+#     delete media uploaded through /admin/media), and public/jobs is a SEPARATE
+#     app (the Job Tracker) deployed out-of-band into this docroot — rsync
+#     --delete would wipe it and its SQLite data if not excluded).
 #   - Runs composer + Phinx migrations on the host over SSH.
 #
 # First-time only (run manually on the host after the first deploy):
@@ -39,6 +41,7 @@ rsync -az --delete -e "ssh -p ${DEPLOY_PORT}" \
   --exclude='.env' \
   --exclude='.deploy.env' \
   --exclude='public/uploads' \
+  --exclude='public/jobs' \
   --exclude='.phpunit.cache' \
   --exclude='data.db' \
   ./ "${DEPLOY_HOST}:${DEPLOY_PATH}/"
