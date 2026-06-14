@@ -39,7 +39,7 @@
 	--emdash-search-highlight: var(--color-accent);
 }
 
-/* Headings use Archivo Black (RetroUI's --font-head) everywhere */
+/* Headings use Bebas Neue (--font-head) everywhere */
 h1, h2, h3, h4, h5, h6 {
 	font-family: var(--font-head);
 	letter-spacing: 2px;
