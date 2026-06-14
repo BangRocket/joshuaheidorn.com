@@ -1,10 +1,20 @@
 <script>
-  import { store, patchSettings } from '../lib/state.svelte.js';
+  import { store } from '../lib/state.svelte.js';
 
   let { onAdd, onToggleSettings } = $props();
 
+  // Dark mode rides the site's cookie + `.dark`/`.light` class switcher (no
+  // per-app theme storage). Track it in $state so the toggle icon stays reactive.
+  let dark = $state(
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark'),
+  );
+
   function toggleTheme() {
-    patchSettings({ theme: store.settings.theme === 'dark' ? 'light' : 'dark' });
+    dark = !dark;
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    root.classList.add(dark ? 'dark' : 'light');
+    document.cookie = `theme=${dark ? 'dark' : 'light'};path=/;max-age=31536000;SameSite=Lax`;
   }
 </script>
 
@@ -32,7 +42,7 @@
     </div>
 
     <button class="icon-btn" title="Toggle dark mode" onclick={toggleTheme} aria-label="Toggle dark mode">
-      {#if store.settings.theme === 'dark'}
+      {#if dark}
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="4" />
           <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />

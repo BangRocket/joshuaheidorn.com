@@ -1,11 +1,7 @@
 // Thin fetch wrapper around the PHP REST API. Every call returns parsed JSON or
 // throws an Error carrying the server's message.
 
-// Relative API path — resolves against the page URL, so it works unchanged
-// whether the app is served at a subdomain root (https://jobs.example.com/)
-// or a subpath (https://example.com/jobs/). The app is a single page served
-// with a trailing slash, so 'api/…' always resolves correctly.
-const API = 'api';
+const API = '/jobs/api';
 
 async function request(method, url, body) {
   const opts = { method, headers: {} };

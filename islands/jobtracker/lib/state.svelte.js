@@ -5,7 +5,7 @@ import { api } from './api.js';
 import { SMAP, ACTIVE, CLOSED } from './statuses.js';
 import { daysSince, isStale } from './compute.js';
 
-const DEFAULT_SETTINGS = { accent: '0.62 0.16 35', stale_days: 14, theme: 'light' };
+const DEFAULT_SETTINGS = { stale_days: 14 };
 
 export const store = $state({
   jobs: [],
@@ -17,29 +17,6 @@ export const store = $state({
   error: null,
 });
 
-/* ---------------- theme / accent ---------------- */
-export function applyAccent() {
-  const [l, c, h] = store.settings.accent.split(' ');
-  const r = document.documentElement.style;
-  r.setProperty('--accent-l', l);
-  r.setProperty('--accent-c', c);
-  r.setProperty('--accent-h', h);
-  const dark = store.settings.theme === 'dark';
-  r.setProperty('--accent-soft', dark ? `oklch(0.33 0.06 ${h})` : `oklch(0.95 0.045 ${h})`);
-  r.setProperty('--accent-ink', dark ? `oklch(0.8 0.11 ${h})` : `oklch(0.42 0.13 ${h})`);
-}
-
-export function applyTheme() {
-  const dark = store.settings.theme === 'dark';
-  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  try {
-    localStorage.setItem('jobtracker.theme', store.settings.theme);
-  } catch (e) {
-    /* private mode — ignore */
-  }
-  applyAccent();
-}
-
 /* ---------------- data loading ---------------- */
 export async function init() {
   try {
@@ -50,7 +27,6 @@ export async function init() {
     store.error = e.message;
   } finally {
     store.loading = false;
-    applyTheme();
   }
 }
 
@@ -72,15 +48,12 @@ export async function removeJob(id) {
 
 /* ---------------- settings mutations ---------------- */
 export async function patchSettings(patch) {
-  // Apply locally first for an instant response, then persist authoritatively.
   Object.assign(store.settings, patch);
-  applyTheme();
   try {
     store.settings = await api.updateSettings(patch);
   } catch (e) {
     store.error = e.message;
   }
-  applyTheme();
 }
 
 /* ---------------- filters ---------------- */
