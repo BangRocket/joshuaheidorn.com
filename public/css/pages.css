@@ -51,7 +51,7 @@
 	.typewriter-caret { animation: none; opacity: 1; }
 }
 .summary {
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	font-size: 1.125rem;
 	line-height: 1.6;
 	color: var(--color-text-secondary);
@@ -70,15 +70,15 @@
 	gap: 0.25rem;
 	padding: 1.5rem 1.5rem 2rem;
 	background: var(--color-bg);
-	border: 2px solid var(--color-border);
-	box-shadow: 4px 4px 0 0 var(--color-shadow);
+	border: var(--border-width) solid var(--color-border);
+	box-shadow: var(--shadow);
 	text-decoration: none;
 	color: var(--color-text);
 	transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .tile:hover {
-	transform: translate(-2px, -2px);
-	box-shadow: 6px 6px 0 0 var(--color-shadow);
+	box-shadow: var(--shadow-hover);
+	transform: translate(2px, 2px);
 }
 .tile:active {
 	transform: translate(2px, 2px);
@@ -107,7 +107,7 @@
 	align-items: baseline;
 	justify-content: space-between;
 	margin-bottom: 1.25rem;
-	border-bottom: 2px solid var(--color-border);
+	border-bottom: var(--border-width) solid var(--color-border);
 	padding-bottom: 0.5rem;
 }
 .strip-header h2 {
@@ -137,7 +137,7 @@
 	gap: 0.5rem 1rem;
 	padding: 1rem 1.25rem;
 	background: var(--color-bg);
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	text-decoration: none;
 	color: var(--color-text);
 	transition: background 0.12s ease;
@@ -155,7 +155,7 @@
 }
 .strip-summary {
 	grid-column: 1 / -1;
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	color: var(--color-text-secondary);
 	font-size: 0.95rem;
 }
@@ -176,7 +176,7 @@
 
 .intro {
 	padding-bottom: 2rem;
-	border-bottom: 2px solid var(--color-border);
+	border-bottom: var(--border-width) solid var(--color-border);
 }
 .resume-name {
 	font-family: var(--font-head);
@@ -191,7 +191,7 @@
 	margin: 0.5rem 0 0;
 }
 .resume-summary {
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	margin: 1rem 0 0;
 	color: var(--color-text-secondary);
 	line-height: 1.6;
@@ -232,8 +232,8 @@
 .entry {
 	padding: 1.25rem 1.5rem;
 	background: var(--color-bg);
-	border: 2px solid var(--color-border);
-	box-shadow: 3px 3px 0 0 var(--color-shadow);
+	border: var(--border-width) solid var(--color-border);
+	box-shadow: var(--shadow);
 }
 
 .entry-head {
@@ -263,7 +263,7 @@
 .entry-bullets {
 	margin: 0.75rem 0 0 1.25rem;
 	padding: 0;
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	line-height: 1.55;
 	color: var(--color-text);
 }
@@ -281,7 +281,7 @@
 	padding: 0.2rem 0.6rem;
 	background: var(--color-accent);
 	color: var(--color-on-accent);
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	font-family: var(--font-sans);
 	font-size: 0.8rem;
 	font-weight: 500;
@@ -397,7 +397,7 @@
 .page-head {
 	margin-bottom: 3rem;
 	padding-bottom: 1.5rem;
-	border-bottom: 2px solid var(--color-border);
+	border-bottom: var(--border-width) solid var(--color-border);
 }
 .page-head h1 {
 	font-family: var(--font-head);
@@ -426,17 +426,17 @@
 	display: flex;
 	flex-direction: column;
 	background: var(--color-bg);
-	border: 2px solid var(--color-border);
-	box-shadow: 4px 4px 0 0 var(--color-shadow);
+	border: var(--border-width) solid var(--color-border);
+	box-shadow: var(--shadow);
 	transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .project-card:hover {
-	transform: translate(-2px, -2px);
-	box-shadow: 6px 6px 0 0 var(--color-shadow);
+	box-shadow: var(--shadow-hover);
+	transform: translate(2px, 2px);
 }
 .project-card .cover-link {
 	display: block;
-	border-bottom: 2px solid var(--color-border);
+	border-bottom: var(--border-width) solid var(--color-border);
 }
 .project-card .cover {
 	aspect-ratio: 16 / 10;
@@ -475,7 +475,7 @@
 }
 .project-card .title a:hover { color: var(--color-accent-hover); }
 .project-card .summary {
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	color: var(--color-text-secondary);
 	font-size: 0.95rem;
 	line-height: 1.5;
@@ -494,7 +494,7 @@
 	padding: 0.15rem 0.55rem;
 	background: var(--color-accent);
 	color: var(--color-on-accent);
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	font-family: var(--font-sans);
 	font-size: 0.75rem;
 	font-weight: 500;
@@ -557,7 +557,7 @@
 	padding: 0.2rem 0.6rem;
 	background: var(--color-accent);
 	color: var(--color-on-accent);
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	font-family: var(--font-sans);
 	font-size: 0.8rem;
 	font-weight: 500;
@@ -579,7 +579,7 @@
 .case-study .meta-links a:hover { color: var(--color-accent-hover); }
 .case-study .hero {
 	margin: 2rem 0;
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 }
 .case-study .hero img {
 	width: 100%;
@@ -587,7 +587,7 @@
 	display: block;
 }
 .case-study .body {
-	font-family: var(--font-sans);
+	font-family: var(--font-prose);
 	font-size: 1.0625rem;
 	line-height: 1.7;
 }
@@ -788,7 +788,7 @@
 .search-result {
 	display: block;
 	padding: var(--spacing-4);
-	border: 2px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	background: var(--color-bg);
 	text-decoration: none;
 	color: var(--color-text);
