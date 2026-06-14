@@ -21,9 +21,10 @@
 
 	:root {
 		/* Fonts (previously provided by Tailwind @theme; now plain vars) */
-		--font-sans: 'Space Grotesk', sans-serif;
-		--font-head: 'Archivo Black', sans-serif;
-		--font-mono: 'JetBrains Mono', monospace;
+		--font-sans: 'Roboto Mono', ui-monospace, monospace;  /* default/UI font (chrome) */
+		--font-head: 'Bebas Neue', sans-serif;                /* display headings */
+		--font-prose: 'Space Grotesk', sans-serif;            /* long-form readable body */
+		--font-mono: 'Roboto Mono', ui-monospace, monospace;  /* code */
 
 		/* Colors - Light mode (default; overridden by theme.css) */
 		--color-bg: #ffffff;
