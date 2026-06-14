@@ -12,8 +12,8 @@
   --line: var(--color-border);              /* black borders */
   --line-strong: var(--color-border);
 
-  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  --sans: inherit;                          /* inherit the site body font */
+  --mono: var(--font-mono);                 /* JetBrains Mono (site token) */
+  --sans: var(--font-sans);                 /* Space Grotesk (site token) */
   --radius: 6px;
   --shadow: 4px 4px 0 var(--color-shadow);  /* yellow offset shadow */
   --header-bg: var(--color-bg-subtle);

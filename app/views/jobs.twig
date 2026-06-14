@@ -13,6 +13,9 @@
             else if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
         })();
     </script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/theme.css" />
     {% for href in assets.css('islands/jobs.js') %}<link rel="stylesheet" href="{{ href }}" />{% endfor %}
 </head>
 <body>
