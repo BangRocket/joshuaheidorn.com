@@ -13,7 +13,11 @@ export default defineConfig({
         assetsDir: "",
         emptyOutDir: true,
         rollupOptions: {
-            input: "islands/main.js",
+            input: {
+                main: "islands/main.js",
+                admin: "islands/admin.js",
+                jobs: "islands/jobs.js",
+            },
         },
     },
 });

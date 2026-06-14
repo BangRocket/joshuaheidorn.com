@@ -127,6 +127,7 @@
 .article-content {
 	font-size: var(--font-size-lg);
 	line-height: var(--leading-relaxed);
+	font-family: var(--font-prose);
 }
 
 .article-content p {
@@ -135,6 +136,7 @@
 
 .article-content h2 {
 	font-size: var(--font-size-2xl);
+	font-family: var(--font-head);
 	margin-top: 2.5em;
 	margin-bottom: 0.75em;
 	scroll-margin-top: calc(var(--nav-height) + var(--spacing-4));
@@ -142,6 +144,7 @@
 
 .article-content h3 {
 	font-size: var(--font-size-xl);
+	font-family: var(--font-head);
 	margin-top: 2em;
 	margin-bottom: 0.5em;
 	scroll-margin-top: calc(var(--nav-height) + var(--spacing-4));
@@ -161,8 +164,9 @@
 	margin: 2em 0;
 	padding: var(--spacing-5);
 	background: var(--color-surface);
-	border: 1px solid var(--color-border);
+	border: var(--border-width) solid var(--color-border);
 	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow);
 	overflow-x: auto;
 	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);

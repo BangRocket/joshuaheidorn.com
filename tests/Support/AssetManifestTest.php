@@ -33,4 +33,31 @@ final class AssetManifestTest extends TestCase
         $this->assertSame('', $manifest->js('islands/main.js'));
         $this->assertSame([], $manifest->css('islands/main.js'));
     }
+
+    public function test_versioned_appends_stable_content_hash(): void
+    {
+        $public = sys_get_temp_dir() . '/jh_public_' . uniqid();
+        mkdir($public . '/css', 0775, true);
+        file_put_contents($public . '/css/theme.css', 'body{}');
+
+        $manifest = new AssetManifest($public . '/assets', '/assets/', $public);
+
+        $url = $manifest->versioned('/css/theme.css');
+        $this->assertMatchesRegularExpression('#^/css/theme\.css\?v=[0-9a-f]{10}$#', $url);
+
+        // Unchanged file → identical query string (so the cache stays warm).
+        $this->assertSame($url, $manifest->versioned('/css/theme.css'));
+
+        // Changed content → different query string (so the cache busts).
+        file_put_contents($public . '/css/theme.css', 'body{color:red}');
+        $reloaded = new AssetManifest($public . '/assets', '/assets/', $public);
+        $this->assertNotSame($url, $reloaded->versioned('/css/theme.css'));
+    }
+
+    public function test_versioned_passes_through_when_file_missing(): void
+    {
+        $manifest = new AssetManifest(sys_get_temp_dir() . '/nope/assets', '/assets/', sys_get_temp_dir() . '/nope');
+
+        $this->assertSame('/css/missing.css', $manifest->versioned('/css/missing.css'));
+    }
 }

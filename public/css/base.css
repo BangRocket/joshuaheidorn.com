@@ -21,9 +21,10 @@
 
 	:root {
 		/* Fonts (previously provided by Tailwind @theme; now plain vars) */
-		--font-sans: 'Space Grotesk', sans-serif;
-		--font-head: 'Archivo Black', sans-serif;
-		--font-mono: 'JetBrains Mono', monospace;
+		--font-sans: 'Roboto Mono', ui-monospace, monospace;  /* default/UI font (chrome) */
+		--font-head: 'Bebas Neue', sans-serif;                /* display headings */
+		--font-prose: 'Space Grotesk', sans-serif;            /* long-form readable body */
+		--font-mono: 'Roboto Mono', ui-monospace, monospace;  /* code */
 
 		/* Colors - Light mode (default; overridden by theme.css) */
 		--color-bg: #ffffff;
@@ -116,38 +117,8 @@
 		--tag-padding-y: 2px;
 
 		/* Shadows */
-		--shadow-dropdown: 0 8px 30px rgba(0, 0, 0, 0.12);
-		--shadow-btn-active: 0 1px 2px rgba(0, 0, 0, 0.05);
-	}
-
-	/* Dark mode via system preference (when no explicit class) */
-	@media (prefers-color-scheme: dark) {
-		:root:not(.light) {
-			--color-bg: #0d0d0d;
-			--color-bg-subtle: #141414;
-			--color-text: #ededed;
-			--color-text-secondary: #a0a0a0;
-			--color-muted: #6b6b6b;
-			--color-border: #2a2a2a;
-			--color-border-subtle: #1f1f1f;
-			--color-surface: #181818;
-			--color-accent: #4d9fff;
-			--color-accent-hover: #6eb0ff;
-		}
-	}
-
-	/* Explicit dark mode */
-	:root.dark {
-		--color-bg: #0d0d0d;
-		--color-bg-subtle: #141414;
-		--color-text: #ededed;
-		--color-text-secondary: #a0a0a0;
-		--color-muted: #6b6b6b;
-		--color-border: #2a2a2a;
-		--color-border-subtle: #1f1f1f;
-		--color-surface: #181818;
-		--color-accent: #4d9fff;
-		--color-accent-hover: #6eb0ff;
+		--shadow-dropdown: var(--shadow);
+		--shadow-btn-active: var(--shadow-hover);
 	}
 
 	html {

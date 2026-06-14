@@ -6,6 +6,7 @@ uploads
 data.db
 /vendor
 .env
+.deploy.env
 /public/uploads
 /public/assets
 .phpunit.cache
