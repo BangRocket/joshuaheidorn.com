@@ -165,6 +165,96 @@ final class TactaGameRepository
         ];
     }
 
+    /**
+     * Shuffle each player's deck once, choose the first player, fix turn order,
+     * and activate the game.
+     *
+     * @return array<string,mixed> the activated game
+     * @throws ValidationException
+     */
+    public function start(string $code): array
+    {
+        $game = $this->requireGame($code);
+        if ($game['status'] !== 'lobby') {
+            throw new ValidationException('Game has already started.');
+        }
+        $players = $this->players($game['id']);
+        if (count($players) < 2) {
+            throw new ValidationException('Need at least 2 players to start.');
+        }
+
+        $decks = [];
+        foreach ($players as $player) {
+            $order = range(0, self::CARDS_PER_PLAYER - 1);
+            shuffle($order);
+            $decks[$player['seat']] = $order;
+            $stmt = $this->pdo->prepare('UPDATE tacta_players SET deck = :deck WHERE id = :id');
+            $stmt->execute([':deck' => json_encode($order), ':id' => $player['id']]);
+        }
+
+        $firstSeat = $this->firstSeat($players, $decks);
+        $turnOrder = $this->clockwiseFrom($players, $firstSeat);
+
+        $stmt = $this->pdo->prepare(
+            'UPDATE tacta_games
+                SET status = :status, current_seat = :seat, turn_order = :order,
+                    seq = seq + 1, updated_at = :now
+              WHERE id = :id'
+        );
+        $stmt->execute([
+            ':status' => 'active',
+            ':seat' => $firstSeat,
+            ':order' => json_encode($turnOrder),
+            ':now' => self::now(),
+            ':id' => $game['id'],
+        ]);
+
+        return $this->findByCode($code);
+    }
+
+    /**
+     * First player = lowest value on either outermost card; tie → lowest combined
+     * value of the two outermost cards; further tie → lowest seat.
+     *
+     * @param list<array<string,mixed>> $players
+     * @param array<int, list<int>> $decks seat => shuffled layout indices
+     */
+    private function firstSeat(array $players, array $decks): int
+    {
+        // Layout values are color-independent (all colors share the 18 layouts).
+        $values = array_map(static fn ($card) => $card->value(), Deck::forColor('blue'));
+
+        $bestKey = null;
+        $bestSeat = $players[0]['seat'];
+        foreach ($players as $player) {
+            $order = $decks[$player['seat']];
+            $top = $values[$order[0]];
+            $bottom = $values[$order[count($order) - 1]];
+            $key = [min($top, $bottom), $top + $bottom, $player['seat']];
+            if ($bestKey === null || $key < $bestKey) {
+                $bestKey = $key;
+                $bestSeat = $player['seat'];
+            }
+        }
+
+        return $bestSeat;
+    }
+
+    /**
+     * Seats in clockwise (ascending-seat) order, rotated so $firstSeat leads.
+     *
+     * @param list<array<string,mixed>> $players
+     * @return list<int>
+     */
+    private function clockwiseFrom(array $players, int $firstSeat): array
+    {
+        $seats = array_map(static fn ($p) => $p['seat'], $players);
+        sort($seats);
+        $index = array_search($firstSeat, $seats, true);
+
+        return array_values(array_merge(array_slice($seats, $index), array_slice($seats, 0, $index)));
+    }
+
     private function generateUniqueCode(): string
     {
         for ($attempt = 0; $attempt < 20; $attempt++) {

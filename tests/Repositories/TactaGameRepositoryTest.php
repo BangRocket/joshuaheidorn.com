@@ -149,4 +149,45 @@ final class TactaGameRepositoryTest extends TestCase
         $this->assertSame(0, $found['seat']);
         $this->assertNull($repo->playerByToken($game['id'], 'nope'));
     }
+
+    public function test_start_requires_two_players(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Solo', 'red');
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->start($code);
+    }
+
+    public function test_start_activates_game_and_deals_decks(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $game = $repo->start($code);
+
+        $this->assertSame('active', $game['status']);
+        $this->assertIsArray($game['turn_order']);
+        $this->assertEqualsCanonicalizing([0, 1], $game['turn_order']);
+        $this->assertContains($game['current_seat'], [0, 1]);
+        $this->assertSame($game['turn_order'][0], $game['current_seat']);
+
+        foreach ($repo->players($game['id']) as $player) {
+            $this->assertIsArray($player['deck']);
+            $this->assertCount(18, $player['deck']);
+            $this->assertEqualsCanonicalizing(range(0, 17), $player['deck']);
+        }
+    }
+
+    public function test_start_rejects_already_started_game(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $repo->start($code);
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->start($code);
+    }
 }
