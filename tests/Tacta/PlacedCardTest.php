@@ -55,6 +55,18 @@ final class PlacedCardTest extends TestCase
         $this->assertSame(Shape::Rectangle, $p->edgeAt(Side::S)->shape);
     }
 
+    public function test_rotation_and_mirror_combined(): void
+    {
+        // rotation=2 (180°) + mirror. Resolve each world side via "undo rotation, then undo E/W mirror":
+        //   N: (0-2+4)%4=2=S, no swap   -> canonical S = Rectangle
+        //   E: (1-2+4)%4=3=W, swap W->E -> canonical E = Square
+        //   S: (2-2+4)%4=0=N, no swap   -> canonical N = Triangle
+        $p = new PlacedCard($this->card(), 'red', 0, 0, 2, true, 0);
+        $this->assertSame(Shape::Rectangle, $p->edgeAt(Side::N)->shape);
+        $this->assertSame(Shape::Square, $p->edgeAt(Side::E)->shape);
+        $this->assertSame(Shape::Triangle, $p->edgeAt(Side::S)->shape);
+    }
+
     public function test_rotation_out_of_range_throws(): void
     {
         $this->expectException(\InvalidArgumentException::class);

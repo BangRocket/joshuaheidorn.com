@@ -16,7 +16,7 @@ final class Deck
     private static function layouts(): array
     {
         $rows = [
-            // N,        E,        S,        R,        suit
+            // N,        E,        S,        W,        suit
             [[self::T, 1], [self::Q, 0], [self::R, 1], [self::T, 0], Suit::Circle],
             [[self::Q, 2], [self::T, 1], [self::Q, 0], [self::R, 0], Suit::Square],
             [[self::R, 1], [self::R, 1], [self::T, 1], [self::Q, 0], Suit::Triangle],

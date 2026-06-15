@@ -118,7 +118,9 @@ final class RulesTest extends TestCase
         $card = $this->card('m', Shape::Square, Shape::Triangle, Shape::Triangle, Shape::Triangle);
         $moves = Rules::legalConnects($board, $card, 'red', $board->nextZ());
 
-        $this->assertNotEmpty($moves);
+        // 4 candidate cells around the lone start, each with exactly 2 orientations that
+        // turn the single Square edge toward it (rotation = facing side, mirror false/true).
+        $this->assertCount(8, $moves);
         foreach ($moves as $move) {
             $this->assertTrue(Rules::isLegalConnect($board, $move));
         }
