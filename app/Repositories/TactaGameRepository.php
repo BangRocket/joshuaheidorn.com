@@ -184,11 +184,11 @@ final class TactaGameRepository
         }
 
         $decks = [];
+        $stmt = $this->pdo->prepare('UPDATE tacta_players SET deck = :deck WHERE id = :id');
         foreach ($players as $player) {
             $order = range(0, self::CARDS_PER_PLAYER - 1);
             shuffle($order);
             $decks[$player['seat']] = $order;
-            $stmt = $this->pdo->prepare('UPDATE tacta_players SET deck = :deck WHERE id = :id');
             $stmt->execute([':deck' => json_encode($order), ':id' => $player['id']]);
         }
 

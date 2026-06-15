@@ -48,6 +48,7 @@ final class CreateTactaTables extends AbstractMigration
             ->addColumn('z', 'integer', ['null' => false])
             ->addColumn('created_at', 'datetime', ['null' => false])
             ->addIndex(['game_id', 'seq'])
+            ->addIndex(['game_id', 'z'], ['unique' => true]) // safety net: one card per board ordinal
             ->addForeignKey('game_id', 'tacta_games', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
             ->create();
     }

@@ -116,11 +116,12 @@ final class TactaGameRepositoryTest extends TestCase
     {
         [$repo] = $this->repo();
         $code = $repo->createGame()['code'];
-        foreach (TactaGameRepository::COLORS as $color) {
+        $colors = array_slice(TactaGameRepository::COLORS, 0, TactaGameRepository::MAX_PLAYERS);
+        foreach ($colors as $color) {
             $repo->join($code, 'P-' . $color, $color);
         }
         $this->expectException(\App\Support\ValidationException::class);
-        $repo->join($code, 'Overflow', 'red'); // all 6 colors used, game full
+        $repo->join($code, 'Overflow', TactaGameRepository::COLORS[0]); // every seat taken, game full
     }
 
     public function test_join_bumps_seq_and_lists_players(): void
@@ -237,11 +238,11 @@ final class TactaGameRepositoryTest extends TestCase
         $first = $game['current_seat'];
         $seqBefore = $game['seq'];
 
-        $after = $repo->recordMove($code, $first, $this->dummyMove(1));
-        $this->assertSame($game['turn_order'][1], $after['current_seat']); // advanced
-        $this->assertSame($seqBefore + 1, $after['seq']);
+        $afterMove = $repo->recordMove($code, $first, $this->dummyMove(1));
+        $this->assertSame($game['turn_order'][1], $afterMove['current_seat']); // advanced
+        $this->assertSame($seqBefore + 1, $afterMove['seq']);
 
-        $moves = $repo->movesSince($after['id'], $seqBefore);
+        $moves = $repo->movesSince($afterMove['id'], $seqBefore);
         $this->assertCount(1, $moves);
         $this->assertSame($first, $moves[0]['seat']);
         $this->assertSame(1, $moves[0]['z']); // first placed card (starting card is z=0)
@@ -265,6 +266,26 @@ final class TactaGameRepositoryTest extends TestCase
         $this->assertSame('done', $game['status']);
         $this->assertNull($game['current_seat']);
         $this->assertCount($total, $repo->movesSince($game['id'], 0));
+    }
+
+    public function test_three_player_turn_rotation_wraps(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'A', 'red');
+        $repo->join($code, 'B', 'blue');
+        $repo->join($code, 'C', 'green');
+        $game = $repo->start($code);
+        $order = $game['turn_order']; // some rotation of [0,1,2]
+        $this->assertEqualsCanonicalizing([0, 1, 2], $order);
+
+        // current_seat must cycle through turn_order and wrap around.
+        $expected = [$order[1], $order[2], $order[0], $order[1]];
+        foreach ($expected as $i => $expectSeat) {
+            $current = $repo->findByCode($code)['current_seat'];
+            $after = $repo->recordMove($code, $current, $this->dummyMove($i));
+            $this->assertSame($expectSeat, $after['current_seat']);
+        }
     }
 
     public function test_purge_stale_deletes_idle_games_and_cascades(): void
