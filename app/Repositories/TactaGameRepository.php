@@ -359,6 +359,21 @@ final class TactaGameRepository
         ];
     }
 
+    /**
+     * Delete games not touched in the last $olderThanMinutes (default 12h).
+     * Cascades to players and moves via the foreign keys.
+     *
+     * @return int number of games removed
+     */
+    public function purgeStale(int $olderThanMinutes = 720): int
+    {
+        $cutoff = (new \DateTimeImmutable("-{$olderThanMinutes} minutes"))->format('Y-m-d H:i:s');
+        $stmt = $this->pdo->prepare('DELETE FROM tacta_games WHERE updated_at < :cutoff');
+        $stmt->execute([':cutoff' => $cutoff]);
+
+        return $stmt->rowCount();
+    }
+
     private function generateUniqueCode(): string
     {
         for ($attempt = 0; $attempt < 20; $attempt++) {

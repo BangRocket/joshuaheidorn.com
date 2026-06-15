@@ -266,4 +266,30 @@ final class TactaGameRepositoryTest extends TestCase
         $this->assertNull($game['current_seat']);
         $this->assertCount($total, $repo->movesSince($game['id'], 0));
     }
+
+    public function test_purge_stale_deletes_idle_games_and_cascades(): void
+    {
+        [$repo, $pdo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $game = $repo->findByCode($code);
+
+        // Back-date so it counts as stale.
+        $stmt = $pdo->prepare("UPDATE tacta_games SET updated_at = '2020-01-01 00:00:00' WHERE id = :id");
+        $stmt->execute([':id' => $game['id']]);
+
+        $deleted = $repo->purgeStale(60);
+        $this->assertSame(1, $deleted);
+        $this->assertNull($repo->findByCode($code));
+        // FK cascade removed the player too.
+        $this->assertCount(0, $repo->players($game['id']));
+    }
+
+    public function test_purge_stale_keeps_fresh_games(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $this->assertSame(0, $repo->purgeStale(60));
+        $this->assertNotNull($repo->findByCode($code));
+    }
 }
