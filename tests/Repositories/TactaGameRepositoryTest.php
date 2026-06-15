@@ -63,4 +63,90 @@ final class TactaGameRepositoryTest extends TestCase
         }
         $this->assertCount(25, array_unique($codes));
     }
+
+    public function test_first_join_is_seat_zero_host(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $player = $repo->join($code, 'Josh', 'red');
+
+        $this->assertSame(0, $player['seat']);
+        $this->assertTrue($player['is_host']);
+        $this->assertSame('red', $player['color']);
+        $this->assertNotSame('', $player['guest_token']);
+    }
+
+    public function test_second_join_is_seat_one_not_host(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $second = $repo->join($code, 'Pat', 'blue');
+
+        $this->assertSame(1, $second['seat']);
+        $this->assertFalse($second['is_host']);
+    }
+
+    public function test_join_rejects_duplicate_color(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->join($code, 'Pat', 'red');
+    }
+
+    public function test_join_rejects_invalid_color(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->join($code, 'Josh', 'chartreuse');
+    }
+
+    public function test_join_rejects_empty_name(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->join($code, '   ', 'red');
+    }
+
+    public function test_join_rejects_when_full(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        foreach (TactaGameRepository::COLORS as $color) {
+            $repo->join($code, 'P-' . $color, $color);
+        }
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->join($code, 'Overflow', 'red'); // all 6 colors used, game full
+    }
+
+    public function test_join_bumps_seq_and_lists_players(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+
+        $game = $repo->findByCode($code);
+        $this->assertSame(2, $game['seq']); // one bump per join
+        $players = $repo->players($game['id']);
+        $this->assertCount(2, $players);
+        $this->assertSame(['red', 'blue'], array_map(static fn ($p) => $p['color'], $players));
+    }
+
+    public function test_player_by_token_finds_the_seat(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $player = $repo->join($code, 'Josh', 'red');
+        $game = $repo->findByCode($code);
+
+        $found = $repo->playerByToken($game['id'], $player['guest_token']);
+        $this->assertNotNull($found);
+        $this->assertSame(0, $found['seat']);
+        $this->assertNull($repo->playerByToken($game['id'], 'nope'));
+    }
 }

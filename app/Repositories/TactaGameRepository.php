@@ -56,6 +56,115 @@ final class TactaGameRepository
         return $row ? $this->castGame($row) : null;
     }
 
+    /**
+     * Add a player to a lobby. The first joiner takes seat 0 and is the host.
+     *
+     * @return array<string,mixed> the new player (including guest_token)
+     * @throws ValidationException
+     */
+    public function join(string $code, string $name, string $color): array
+    {
+        $game = $this->requireGame($code);
+        if ($game['status'] !== 'lobby') {
+            throw new ValidationException('Game has already started.');
+        }
+        $name = trim($name);
+        if ($name === '') {
+            throw new ValidationException('Name is required.');
+        }
+        $name = mb_substr($name, 0, 64);
+        if (!in_array($color, self::COLORS, true)) {
+            throw new ValidationException('Invalid color.');
+        }
+
+        $players = $this->players($game['id']);
+        if (count($players) >= self::MAX_PLAYERS) {
+            throw new ValidationException('Game is full.');
+        }
+        foreach ($players as $existing) {
+            if ($existing['color'] === $color) {
+                throw new ValidationException('Color already taken.');
+            }
+        }
+
+        $seat = count($players);
+        $token = bin2hex(random_bytes(16));
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO tacta_players
+                (game_id, seat, color, display_name, guest_token, deck, is_host, joined_at)
+             VALUES (:game_id, :seat, :color, :name, :token, NULL, :is_host, :joined_at)'
+        );
+        $stmt->execute([
+            ':game_id' => $game['id'],
+            ':seat' => $seat,
+            ':color' => $color,
+            ':name' => $name,
+            ':token' => $token,
+            ':is_host' => $seat === 0 ? 1 : 0,
+            ':joined_at' => self::now(),
+        ]);
+
+        $this->bumpSeq($game['id']);
+
+        return $this->playerByToken($game['id'], $token);
+    }
+
+    /** @return list<array<string,mixed>> players ordered by seat */
+    public function players(int $gameId): array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM tacta_players WHERE game_id = :id ORDER BY seat ASC');
+        $stmt->execute([':id' => $gameId]);
+
+        return array_map([$this, 'castPlayer'], $stmt->fetchAll());
+    }
+
+    /** @return array<string,mixed>|null */
+    public function playerByToken(int $gameId, string $token): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM tacta_players WHERE game_id = :id AND guest_token = :token'
+        );
+        $stmt->execute([':id' => $gameId, ':token' => $token]);
+        $row = $stmt->fetch();
+
+        return $row ? $this->castPlayer($row) : null;
+    }
+
+    /** @throws ValidationException */
+    private function requireGame(string $code): array
+    {
+        $game = $this->findByCode($code);
+        if ($game === null) {
+            throw new ValidationException('Game not found.');
+        }
+
+        return $game;
+    }
+
+    private function bumpSeq(int $gameId): void
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE tacta_games SET seq = seq + 1, updated_at = :now WHERE id = :id'
+        );
+        $stmt->execute([':now' => self::now(), ':id' => $gameId]);
+    }
+
+    /** @param array<string,mixed> $row */
+    private function castPlayer(array $row): array
+    {
+        return [
+            'id' => (int) $row['id'],
+            'game_id' => (int) $row['game_id'],
+            'seat' => (int) $row['seat'],
+            'color' => $row['color'],
+            'display_name' => $row['display_name'],
+            'guest_token' => $row['guest_token'],
+            'deck' => $row['deck'] === null ? null : json_decode($row['deck'], true),
+            'is_host' => (bool) $row['is_host'],
+            'joined_at' => $row['joined_at'],
+        ];
+    }
+
     private function generateUniqueCode(): string
     {
         for ($attempt = 0; $attempt < 20; $attempt++) {
