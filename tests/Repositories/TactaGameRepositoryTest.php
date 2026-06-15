@@ -190,4 +190,80 @@ final class TactaGameRepositoryTest extends TestCase
         $this->expectException(\App\Support\ValidationException::class);
         $repo->start($code);
     }
+
+    /** @return array<string,mixed> a dummy placement (legality is not checked here) */
+    private function dummyMove(int $x): array
+    {
+        return [
+            'card_id' => 'red-1',
+            'draw_end' => 'top',
+            'x' => $x,
+            'y' => 0,
+            'rotation' => 0,
+            'mirror' => false,
+        ];
+    }
+
+    public function test_record_move_rejects_when_not_active(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->recordMove($code, 0, $this->dummyMove(0)); // still in lobby
+    }
+
+    public function test_record_move_rejects_out_of_turn(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $game = $repo->start($code);
+        $notCurrent = $game['current_seat'] === 0 ? 1 : 0;
+
+        $this->expectException(\App\Support\ValidationException::class);
+        $repo->recordMove($code, $notCurrent, $this->dummyMove(0));
+    }
+
+    public function test_record_move_appends_advances_turn_and_is_visible(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $game = $repo->start($code);
+        $first = $game['current_seat'];
+        $seqBefore = $game['seq'];
+
+        $after = $repo->recordMove($code, $first, $this->dummyMove(1));
+        $this->assertSame($game['turn_order'][1], $after['current_seat']); // advanced
+        $this->assertSame($seqBefore + 1, $after['seq']);
+
+        $moves = $repo->movesSince($after['id'], $seqBefore);
+        $this->assertCount(1, $moves);
+        $this->assertSame($first, $moves[0]['seat']);
+        $this->assertSame(1, $moves[0]['z']); // first placed card (starting card is z=0)
+    }
+
+    public function test_game_ends_after_all_cards_are_played(): void
+    {
+        [$repo] = $this->repo();
+        $code = $repo->createGame()['code'];
+        $repo->join($code, 'Josh', 'red');
+        $repo->join($code, 'Pat', 'blue');
+        $repo->start($code);
+
+        $total = TactaGameRepository::CARDS_PER_PLAYER * 2; // 36
+        for ($i = 0; $i < $total; $i++) {
+            $game = $repo->findByCode($code);
+            $repo->recordMove($code, $game['current_seat'], $this->dummyMove($i));
+        }
+
+        $game = $repo->findByCode($code);
+        $this->assertSame('done', $game['status']);
+        $this->assertNull($game['current_seat']);
+        $this->assertCount($total, $repo->movesSince($game['id'], 0));
+    }
 }

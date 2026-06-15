@@ -255,6 +255,110 @@ final class TactaGameRepository
         return array_values(array_merge(array_slice($seats, $index), array_slice($seats, 0, $index)));
     }
 
+    /**
+     * Append a move, advance the turn, and end the game when every card is played.
+     * Enforces turn ownership only; placement legality is the controller's job.
+     *
+     * @param array{card_id:string,draw_end:string,x:int,y:int,rotation:int,mirror:bool} $move
+     * @return array<string,mixed> the updated game
+     * @throws ValidationException
+     */
+    public function recordMove(string $code, int $seat, array $move): array
+    {
+        $game = $this->requireGame($code);
+        if ($game['status'] !== 'active') {
+            throw new ValidationException('Game is not active.');
+        }
+        if ($game['current_seat'] !== $seat) {
+            throw new ValidationException('It is not your turn.');
+        }
+
+        $z = $this->moveCount($game['id']) + 1; // 1-based; starting card is z=0
+        $newSeq = $game['seq'] + 1;
+
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO tacta_moves
+                (game_id, seq, seat, card_id, draw_end, x, y, rotation, mirror, z, created_at)
+             VALUES (:game_id, :seq, :seat, :card_id, :draw_end, :x, :y, :rotation, :mirror, :z, :now)'
+        );
+        $stmt->execute([
+            ':game_id' => $game['id'],
+            ':seq' => $newSeq,
+            ':seat' => $seat,
+            ':card_id' => (string) $move['card_id'],
+            ':draw_end' => $move['draw_end'] === 'bottom' ? 'bottom' : 'top',
+            ':x' => (int) $move['x'],
+            ':y' => (int) $move['y'],
+            ':rotation' => (int) $move['rotation'],
+            ':mirror' => !empty($move['mirror']) ? 1 : 0,
+            ':z' => $z,
+            ':now' => self::now(),
+        ]);
+
+        $totalCards = self::CARDS_PER_PLAYER * count($this->players($game['id']));
+        if ($z >= $totalCards) {
+            $stmt = $this->pdo->prepare(
+                'UPDATE tacta_games SET status = :status, current_seat = NULL, seq = :seq, updated_at = :now WHERE id = :id'
+            );
+            $stmt->execute([':status' => 'done', ':seq' => $newSeq, ':now' => self::now(), ':id' => $game['id']]);
+        } else {
+            $next = $this->nextSeat($game, $seat);
+            $stmt = $this->pdo->prepare(
+                'UPDATE tacta_games SET current_seat = :seat, seq = :seq, updated_at = :now WHERE id = :id'
+            );
+            $stmt->execute([':seat' => $next, ':seq' => $newSeq, ':now' => self::now(), ':id' => $game['id']]);
+        }
+
+        return $this->findByCode($code);
+    }
+
+    /** @return list<array<string,mixed>> moves with seq greater than $sinceSeq, in order */
+    public function movesSince(int $gameId, int $sinceSeq): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM tacta_moves WHERE game_id = :id AND seq > :seq ORDER BY seq ASC'
+        );
+        $stmt->execute([':id' => $gameId, ':seq' => $sinceSeq]);
+
+        return array_map([$this, 'castMove'], $stmt->fetchAll());
+    }
+
+    private function moveCount(int $gameId): int
+    {
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM tacta_moves WHERE game_id = :id');
+        $stmt->execute([':id' => $gameId]);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /** @param array<string,mixed> $game a cast game (turn_order is an array) */
+    private function nextSeat(array $game, int $seat): int
+    {
+        $order = $game['turn_order'];
+        $index = array_search($seat, $order, true);
+
+        return $order[($index + 1) % count($order)];
+    }
+
+    /** @param array<string,mixed> $row */
+    private function castMove(array $row): array
+    {
+        return [
+            'id' => (int) $row['id'],
+            'game_id' => (int) $row['game_id'],
+            'seq' => (int) $row['seq'],
+            'seat' => (int) $row['seat'],
+            'card_id' => $row['card_id'],
+            'draw_end' => $row['draw_end'],
+            'x' => (int) $row['x'],
+            'y' => (int) $row['y'],
+            'rotation' => (int) $row['rotation'],
+            'mirror' => (bool) $row['mirror'],
+            'z' => (int) $row['z'],
+            'created_at' => $row['created_at'],
+        ];
+    }
+
     private function generateUniqueCode(): string
     {
         for ($attempt = 0; $attempt < 20; $attempt++) {
