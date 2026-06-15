@@ -10,3 +10,4 @@ data.db
 /public/uploads
 /public/assets
 .phpunit.cache
+.superpowers/
