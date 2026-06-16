@@ -1,24 +1,19 @@
 <script>
   import { store, submitMove } from "../lib/state.svelte.js";
+  import { highlightCells } from "../lib/cards.js";
   import Card from "./Card.svelte";
 
   const CELL = 66;
 
   // Bounds across placed cards + legal targets, so the board auto-centers.
   const placed = $derived(Object.values(store.cells));
-  const legal = $derived(
-    store.you?.your_turn
-      ? (store.you.legal ?? []).filter((m) =>
-          store.selected === "top" ? m.draw_end === "top" : m.draw_end === "bottom",
-        )
-      : [],
-  );
-  // One clickable target per cell (any legal orientation is accepted by the server,
-  // so the last-seen one for a given cell is fine).
+  // Only the cells where the SELECTED card fits in the player's CHOSEN orientation
+  // (rotation + flip). Pick a different orientation and different cells light up;
+  // a card is never silently re-oriented to fit.
   const legalCells = $derived(
-    Object.values(
-      Object.fromEntries(legal.map((m) => [`${m.x},${m.y}`, m])),
-    ),
+    store.you?.your_turn
+      ? highlightCells(store.you.legal, store.selected, store.rotation, store.mirror)
+      : [],
   );
 
   const xs = $derived([...placed, ...legalCells, { x: 0, y: 0 }].map((c) => c.x));

@@ -22,3 +22,16 @@ export function edgeAt(layout, worldSide, rotation, mirror) {
   }
   return layout.edges[FROM_INDEX[i]];
 }
+
+/**
+ * The server's `you.legal` lists every legal orientation of both outermost cards.
+ * Highlight only the placements for the *chosen* hand card AND the player's current
+ * rotation/mirror — so the player's flip/twist choice is honoured and a card is never
+ * silently re-oriented to fit. An orientation with no legal placement returns [].
+ */
+export function highlightCells(legal, selected, rotation, mirror) {
+  const drawEnd = selected === "bottom" ? "bottom" : "top";
+  return (legal ?? []).filter(
+    (m) => m.draw_end === drawEnd && m.rotation === rotation && m.mirror === mirror,
+  );
+}

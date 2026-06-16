@@ -13,6 +13,8 @@ export const store = $state({
   cells: {},            // "x,y" -> move
   you: null,            // { seat, color, your_turn, hand, legal }
   selected: "top",      // which hand card is selected: "top" | "bottom"
+  rotation: 0,          // chosen orientation of the selected card: 0..3 quarter-turns
+  mirror: false,        // chosen face of the selected card
   error: null,
   polling: false,
 });
@@ -40,6 +42,14 @@ export function applyState(resp) {
 
   // The game is final — stop the poll loop so a lingering game-over tab goes quiet.
   if (store.status === "done") stopPolling();
+
+  // While it isn't our turn, keep the placement controls reset so each turn
+  // starts from a clean orientation (top card, no rotation/flip).
+  if (!store.you?.your_turn) {
+    store.selected = "top";
+    store.rotation = 0;
+    store.mirror = false;
+  }
 
   // If the selected hand card no longer exists (end of deck), fall back to the other,
   // so the board keeps showing legal targets instead of going blank.
@@ -101,6 +111,17 @@ export async function submitMove(legal) {
 
 export function selectCard(which) {
   store.selected = which;
+  // Switching cards starts a fresh orientation choice.
+  store.rotation = 0;
+  store.mirror = false;
+}
+
+export function rotateCard() {
+  store.rotation = (store.rotation + 1) % 4;
+}
+
+export function flipCard() {
+  store.mirror = !store.mirror;
 }
 
 export async function pollOnce() {
@@ -129,6 +150,6 @@ export function resetForTest() {
   Object.assign(store, {
     screen: "lobby", code: null, joined: false, deck: null, status: "lobby",
     seq: -1, currentSeat: null, players: [], scores: {}, cells: {}, you: null,
-    selected: "top", error: null, polling: false,
+    selected: "top", rotation: 0, mirror: false, error: null, polling: false,
   });
 }
