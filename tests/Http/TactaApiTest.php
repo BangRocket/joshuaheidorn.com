@@ -139,4 +139,100 @@ final class TactaApiTest extends TestCase
         $res = $this->get($app, '/tacta/api/games/ZZZZZZ/state');
         $this->assertSame(404, $res->getStatusCode());
     }
+
+    /** Create + 2 joins; returns [code, hostToken, guestToken]. */
+    private function twoPlayerLobby($app): array
+    {
+        $code = $this->body($this->post($app, '/tacta/api/games', []))['code'];
+        $j1 = $this->post($app, "/tacta/api/games/{$code}/join", ['name' => 'Josh', 'color' => 'red']);
+        $j2 = $this->post($app, "/tacta/api/games/{$code}/join", ['name' => 'Pat', 'color' => 'blue']);
+
+        return [$code, $this->cookieToken($j1, $code), $this->cookieToken($j2, $code)];
+    }
+
+    public function test_only_host_can_start(): void
+    {
+        $app = $this->app();
+        [$code, , $guestToken] = $this->twoPlayerLobby($app);
+
+        $byGuest = $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $guestToken]);
+        $this->assertSame(403, $byGuest->getStatusCode());
+    }
+
+    public function test_host_start_activates_game(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken] = $this->twoPlayerLobby($app);
+
+        $start = $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+        $this->assertSame(200, $start->getStatusCode());
+
+        $state = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $hostToken]));
+        $this->assertSame('active', $state['status']);
+        $this->assertNotNull($state['you']['hand']['top']);
+    }
+
+    public function test_move_out_of_turn_is_rejected(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken, $guestToken] = $this->twoPlayerLobby($app);
+        $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+
+        $state = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $hostToken]));
+        $current = $state['current_seat'];
+        $notCurrentToken = $current === 0 ? $guestToken : $hostToken;
+
+        $res = $this->post($app, "/tacta/api/games/{$code}/moves",
+            ['draw_end' => 'top', 'x' => 0, 'y' => -1, 'rotation' => 0, 'mirror' => false],
+            ['tacta_' . $code => $notCurrentToken]);
+        $this->assertSame(409, $res->getStatusCode());
+    }
+
+    public function test_legal_first_move_is_accepted_and_advances_turn(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken, $guestToken] = $this->twoPlayerLobby($app);
+        $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+
+        $state = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $hostToken]));
+        $current = $state['current_seat'];
+        $currentToken = $current === 0 ? $hostToken : $guestToken;
+
+        // Read the current player's top card and compute a legal placement via the engine.
+        $me = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $currentToken]))['you'];
+        [$color, $n] = explode('-', $me['hand']['top']);
+        $card = \App\Tacta\Deck::forColor($color)[(int) $n - 1];
+        $board = \App\Tacta\BoardBuilder::build([]);
+        $legal = \App\Tacta\Rules::legalConnects($board, $card, $color, $board->nextZ());
+        $this->assertNotEmpty($legal);
+        $place = $legal[0];
+
+        $res = $this->post($app, "/tacta/api/games/{$code}/moves", [
+            'draw_end' => 'top',
+            'x' => $place->x, 'y' => $place->y,
+            'rotation' => $place->rotation, 'mirror' => $place->mirror,
+        ], ['tacta_' . $code => $currentToken]);
+
+        $this->assertSame(200, $res->getStatusCode(), (string) $res->getBody());
+
+        $after = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $currentToken]));
+        $this->assertNotSame($current, $after['current_seat']); // turn advanced
+        $this->assertCount(1, $after['moves']);                  // one card on the board
+        $this->assertSame($place->x, $after['moves'][0]['x']);
+    }
+
+    public function test_illegal_move_is_rejected_with_400(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken, $guestToken] = $this->twoPlayerLobby($app);
+        $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+        $state = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $hostToken]));
+        $currentToken = $state['current_seat'] === 0 ? $hostToken : $guestToken;
+
+        // Far-away isolated drop while a legal connect to the starting card exists.
+        $res = $this->post($app, "/tacta/api/games/{$code}/moves",
+            ['draw_end' => 'top', 'x' => 20, 'y' => 20, 'rotation' => 0, 'mirror' => false],
+            ['tacta_' . $code => $currentToken]);
+        $this->assertSame(400, $res->getStatusCode());
+    }
 }
