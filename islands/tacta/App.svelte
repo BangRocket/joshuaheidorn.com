@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { store, joinGame, pollOnce, startPolling, stopPolling, loadDeck } from "./lib/state.svelte.js";
+  import { store, stopPolling, loadDeck } from "./lib/state.svelte.js";
   import Lobby from "./components/Lobby.svelte";
   import Game from "./components/Game.svelte";
   import GameOver from "./components/GameOver.svelte";

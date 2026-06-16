@@ -37,6 +37,17 @@ export function applyState(resp) {
     store.cells[`${m.x},${m.y}`] = m;
   }
   store.screen = deriveScreen();
+
+  // The game is final — stop the poll loop so a lingering game-over tab goes quiet.
+  if (store.status === "done") stopPolling();
+
+  // If the selected hand card no longer exists (end of deck), fall back to the other,
+  // so the board keeps showing legal targets instead of going blank.
+  const hand = store.you?.hand;
+  if (store.you?.your_turn && hand) {
+    if (store.selected === "bottom" && !hand.bottom) store.selected = "top";
+    else if (store.selected === "top" && !hand.top) store.selected = "bottom";
+  }
 }
 
 export async function loadDeck() {

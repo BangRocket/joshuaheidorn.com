@@ -94,6 +94,7 @@ final class TactaController
 
         $since = (int) ($request->getQueryParams()['since'] ?? -1);
         $players = $this->repo->players($game['id']);
+        // Full log: needed to rebuild the board + scores; the response only ships moves > $since.
         $allMoves = $this->repo->movesSince($game['id'], 0);
         $counts = $this->drawCountsBySeat($allMoves);
 

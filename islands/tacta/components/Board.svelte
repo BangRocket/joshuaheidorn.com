@@ -13,7 +13,8 @@
         )
       : [],
   );
-  // Deduplicate legal cells (first orientation wins for a given cell).
+  // One clickable target per cell (any legal orientation is accepted by the server,
+  // so the last-seen one for a given cell is fine).
   const legalCells = $derived(
     Object.values(
       Object.fromEntries(legal.map((m) => [`${m.x},${m.y}`, m])),
