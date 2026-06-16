@@ -23,8 +23,9 @@
 </head>
 <body class="admin admin-login-page">
     <main class="admin-login">
-        <h1>Admin</h1>
-        <div data-island="AdminLogin" data-props='{{ {"publishableKey": clerk_pk}|json_encode }}'></div>
+        <h1>{{ login_context|default('Admin') }}</h1>
+        <p class="admin-login-sub">Sign in to continue to {{ login_context|default('Admin') }}.</p>
+        <div data-island="AdminLogin" data-props='{{ {"publishableKey": clerk_pk, "redirectUrl": redirect_url|default('/admin')}|json_encode }}'></div>
     </main>
     {% if assets.js('islands/admin.js') %}<script type="module" src="{{ assets.js('islands/admin.js') }}"></script>{% endif %}
 </body>

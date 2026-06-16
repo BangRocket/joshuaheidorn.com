@@ -10,6 +10,22 @@ namespace App\Support;
  */
 final class Auth
 {
+    /**
+     * Validate a post-login return path. Returns $next only when it is a same-site
+     * relative path under a guarded route (/jobs or /admin); otherwise '/admin'.
+     * Blocks open redirects (//host, https://…) and unrelated paths.
+     */
+    public static function safeNext(?string $next): string
+    {
+        $default = '/admin';
+        if (!is_string($next) || $next === '') {
+            return $default;
+        }
+
+        // First path segment must be exactly "jobs" or "admin".
+        return preg_match('#^/(jobs|admin)($|[/?])#', $next) === 1 ? $next : $default;
+    }
+
     public static function start(): void
     {
         if (session_status() === PHP_SESSION_NONE) {

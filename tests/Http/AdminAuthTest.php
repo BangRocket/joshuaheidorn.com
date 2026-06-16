@@ -40,7 +40,10 @@ final class AdminAuthTest extends TestCase
         $response = $app->handle($request);
 
         $this->assertSame(302, $response->getStatusCode());
-        $this->assertSame('/admin/login', $response->getHeaderLine('Location'));
+        $location = $response->getHeaderLine('Location');
+        $this->assertStringStartsWith('/admin/login?next=', $location);
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $q);
+        $this->assertSame('/admin', $q['next']);
     }
 
     public function test_login_page_is_reachable_when_signed_out(): void
@@ -50,6 +53,31 @@ final class AdminAuthTest extends TestCase
         $response = $app->handle($request);
 
         $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function test_login_page_carries_jobs_return_url_and_context(): void
+    {
+        $app = $this->app();
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/admin/login?next=%2Fjobs');
+        $response = $app->handle($request);
+        $body = (string) $response->getBody();
+
+        $this->assertSame(200, $response->getStatusCode());
+        // The validated return URL is handed to the sign-in island (JSON-encoded "/jobs")...
+        $this->assertStringContainsString('\/jobs', $body);
+        // ...and the heading reflects the Jobs context.
+        $this->assertStringContainsString('Jobs', $body);
+    }
+
+    public function test_login_page_ignores_malicious_return_url(): void
+    {
+        $app = $this->app();
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/admin/login?next=https%3A%2F%2Fevil.com');
+        $response = $app->handle($request);
+        $body = (string) $response->getBody();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringNotContainsString('evil.com', $body);
     }
 
     public function test_legacy_php_session_does_not_unlock_admin(): void
@@ -64,6 +92,6 @@ final class AdminAuthTest extends TestCase
         unset($_SESSION['uid']);
 
         $this->assertSame(302, $response->getStatusCode());
-        $this->assertSame('/admin/login', $response->getHeaderLine('Location'));
+        $this->assertStringStartsWith('/admin/login', $response->getHeaderLine('Location'));
     }
 }

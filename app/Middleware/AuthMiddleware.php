@@ -30,8 +30,15 @@ final class AuthMiddleware implements MiddlewareInterface
         }
 
         if (!$this->clerk->isAdmin($request)) {
+            // Remember where they were headed so login can send them back.
+            $uri = $request->getUri();
+            $target = $uri->getPath();
+            if ($uri->getQuery() !== '') {
+                $target .= '?' . $uri->getQuery();
+            }
+
             return (new SlimResponse())
-                ->withHeader('Location', '/admin/login')
+                ->withHeader('Location', '/admin/login?next=' . rawurlencode($target))
                 ->withStatus(302);
         }
 

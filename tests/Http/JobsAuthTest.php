@@ -29,22 +29,34 @@ final class JobsAuthTest extends TestCase
         return require $root . '/app/bootstrap.php';
     }
 
-    public function test_jobs_page_redirects_when_signed_out(): void
+    /** Decode the `next` param out of a Location header. */
+    private static function nextOf(string $location): ?string
+    {
+        $query = parse_url($location, PHP_URL_QUERY);
+        if (!is_string($query)) {
+            return null;
+        }
+        parse_str($query, $params);
+        return $params['next'] ?? null;
+    }
+
+    public function test_jobs_page_redirects_to_login_with_return_url(): void
     {
         $app = $this->app();
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/jobs');
         $res = $app->handle($req);
         $this->assertSame(302, $res->getStatusCode());
-        $this->assertSame('/admin/login', $res->getHeaderLine('Location'));
+        $this->assertStringStartsWith('/admin/login?next=', $res->getHeaderLine('Location'));
+        $this->assertSame('/jobs', self::nextOf($res->getHeaderLine('Location')));
     }
 
-    public function test_jobs_api_is_gated_when_signed_out(): void
+    public function test_jobs_api_is_gated_with_return_url(): void
     {
         $app = $this->app();
         $req = (new ServerRequestFactory())->createServerRequest('GET', '/jobs/api/jobs');
         $res = $app->handle($req);
         $this->assertSame(302, $res->getStatusCode());
-        $this->assertSame('/admin/login', $res->getHeaderLine('Location'));
+        $this->assertSame('/jobs/api/jobs', self::nextOf($res->getHeaderLine('Location')));
     }
 
     #[DataProvider('mutatingRoutes')]
@@ -54,7 +66,8 @@ final class JobsAuthTest extends TestCase
         $req = (new ServerRequestFactory())->createServerRequest($method, $path);
         $res = $app->handle($req);
         $this->assertSame(302, $res->getStatusCode());
-        $this->assertSame('/admin/login', $res->getHeaderLine('Location'));
+        $this->assertStringStartsWith('/admin/login?next=', $res->getHeaderLine('Location'));
+        $this->assertSame($path, self::nextOf($res->getHeaderLine('Location')));
     }
 
     /** @return array<string, array{string, string}> */
