@@ -17,6 +17,7 @@ export default defineConfig({
                 main: "islands/main.js",
                 admin: "islands/admin.js",
                 jobs: "islands/jobs.js",
+                tacta: "islands/tacta.js",
             },
         },
     },
