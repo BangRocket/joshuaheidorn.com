@@ -52,7 +52,8 @@ $app->add(function ($request, $handler) {
     if ($request->getMethod() === 'GET'
         && !str_starts_with($request->getUri()->getPath(), '/api')
         && !str_starts_with($request->getUri()->getPath(), '/admin')
-        && !str_starts_with($request->getUri()->getPath(), '/jobs')) {
+        && !str_starts_with($request->getUri()->getPath(), '/jobs')
+        && !str_starts_with($request->getUri()->getPath(), '/tacta')) {
         return $response->withHeader('Cache-Control', 'public, max-age=300');
     }
     return $response;

@@ -107,4 +107,20 @@ return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth)
         $group->get('/api/settings', [$jobCtrl, 'getSettings']);
         $group->put('/api/settings', [$jobCtrl, 'saveSettings']);
     })->add(new \App\Middleware\AuthMiddleware($clerkAuth));
+
+    // ----- Tacta (hidden game; unlisted, room-code-gated) -----
+    $tactaCtrl = new \App\Controllers\TactaController(
+        $twig,
+        new \App\Repositories\TactaGameRepository($pdo),
+    );
+
+    $app->group('/tacta', function ($group) use ($tactaCtrl) {
+        $group->get('', [$tactaCtrl, 'page']);
+        $group->post('/api/games', [$tactaCtrl, 'create']);
+        $group->post('/api/games/{code}/join', [$tactaCtrl, 'join']);
+        $group->get('/api/games/{code}/state', [$tactaCtrl, 'state']);
+        $group->get('/{code}', [$tactaCtrl, 'page']);
+        $group->post('/api/games/{code}/start', [$tactaCtrl, 'start']);
+        $group->post('/api/games/{code}/moves', [$tactaCtrl, 'move']);
+    });
 };
