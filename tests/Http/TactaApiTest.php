@@ -247,4 +247,42 @@ final class TactaApiTest extends TestCase
             ['draw_end' => 'top', 'x' => 0, 'y' => -1, 'rotation' => 0, 'mirror' => false]);
         $this->assertSame(403, $res->getStatusCode());
     }
+
+    public function test_deck_endpoint_returns_18_layouts(): void
+    {
+        $app = $this->app();
+        $res = $this->get($app, '/tacta/api/deck');
+        $this->assertSame(200, $res->getStatusCode());
+        $body = $this->body($res);
+        $this->assertCount(18, $body['layouts']);
+        $first = $body['layouts'][0];
+        $this->assertArrayHasKey('edges', $first);
+        $this->assertArrayHasKey('N', $first['edges']);
+        $this->assertArrayHasKey('shape', $first['edges']['N']);
+        $this->assertArrayHasKey('dots', $first['edges']['N']);
+    }
+
+    public function test_state_includes_legal_moves_for_the_current_player(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken, $guestToken] = $this->twoPlayerLobby($app);
+        $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+
+        $state = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $hostToken]));
+        $currentToken = $state['current_seat'] === 0 ? $hostToken : $guestToken;
+
+        $me = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $currentToken]))['you'];
+        $this->assertTrue($me['your_turn']);
+        $this->assertNotEmpty($me['legal']); // a first move against the starting card always exists
+        $first = $me['legal'][0];
+        foreach (['card_id', 'draw_end', 'x', 'y', 'rotation', 'mirror'] as $key) {
+            $this->assertArrayHasKey($key, $first);
+        }
+
+        // The non-current player gets no legal list.
+        $otherToken = $currentToken === $hostToken ? $guestToken : $hostToken;
+        $other = $this->body($this->get($app, "/tacta/api/games/{$code}/state", ['tacta_' . $code => $otherToken]))['you'];
+        $this->assertFalse($other['your_turn']);
+        $this->assertArrayNotHasKey('legal', $other);
+    }
 }

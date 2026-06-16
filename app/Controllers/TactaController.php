@@ -7,8 +7,11 @@ namespace App\Controllers;
 use App\Repositories\TactaGameRepository;
 use App\Support\ValidationException;
 use App\Tacta\BoardBuilder;
+use App\Tacta\Deck;
 use App\Tacta\MoveValidator;
+use App\Tacta\Rules;
 use App\Tacta\Scorer;
+use App\Tacta\Side;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
@@ -24,6 +27,28 @@ final class TactaController
     public function page(Request $request, Response $response): Response
     {
         return $this->twig->render($response, 'tacta.twig', []);
+    }
+
+    public function deck(Request $request, Response $response): Response
+    {
+        $layouts = [];
+        foreach (Deck::forColor('blue') as $i => $card) {
+            $edges = [];
+            foreach ([Side::N, Side::E, Side::S, Side::W] as $side) {
+                $edges[$side->name] = [
+                    'shape' => $card->edge($side)->shape->value,
+                    'dots' => $card->edge($side)->dots,
+                ];
+            }
+            $layouts[] = [
+                'index' => $i,
+                'edges' => $edges,
+                'value' => $card->value(),
+                'suit' => $card->suit->value,
+            ];
+        }
+
+        return $this->json($response, ['layouts' => $layouts]);
     }
 
     public function create(Request $request, Response $response): Response
@@ -100,7 +125,11 @@ final class TactaController
                 'hand' => null,
             ];
             if ($game['status'] === 'active' && is_array($me['deck'])) {
-                $you['hand'] = $this->hand($me, $counts[$me['seat']] ?? ['top' => 0, 'bottom' => 0]);
+                $seatCounts = $counts[$me['seat']] ?? ['top' => 0, 'bottom' => 0];
+                $you['hand'] = $this->hand($me, $seatCounts);
+                if ($you['your_turn']) {
+                    $you['legal'] = $this->legalMoves($board, $me, $seatCounts);
+                }
             }
         }
 
@@ -209,6 +238,43 @@ final class TactaController
             $seat = (int) $move['seat'];
             $out[$seat] ??= ['top' => 0, 'bottom' => 0];
             $out[$seat][$move['draw_end'] === 'bottom' ? 'bottom' : 'top']++;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Legal connecting placements for the current player's two outermost cards.
+     *
+     * @param array<string,mixed> $me
+     * @param array{top:int,bottom:int} $counts
+     * @return list<array{card_id:string,draw_end:string,x:int,y:int,rotation:int,mirror:bool}>
+     */
+    private function legalMoves(\App\Tacta\Board $board, array $me, array $counts): array
+    {
+        $deck = $me['deck'];
+        $head = $counts['top'];
+        $tail = count($deck) - 1 - $counts['bottom'];
+        if ($head > $tail) {
+            return [];
+        }
+        $ends = $head === $tail
+            ? [['top', $deck[$head]]]
+            : [['top', $deck[$head]], ['bottom', $deck[$tail]]];
+
+        $cards = Deck::forColor($me['color']);
+        $out = [];
+        foreach ($ends as [$drawEnd, $index]) {
+            foreach (Rules::legalConnects($board, $cards[$index], $me['color'], $board->nextZ()) as $placement) {
+                $out[] = [
+                    'card_id' => $me['color'] . '-' . ($index + 1),
+                    'draw_end' => $drawEnd,
+                    'x' => $placement->x,
+                    'y' => $placement->y,
+                    'rotation' => $placement->rotation,
+                    'mirror' => $placement->mirror,
+                ];
+            }
         }
 
         return $out;

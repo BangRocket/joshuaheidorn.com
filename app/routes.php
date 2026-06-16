@@ -116,6 +116,7 @@ return function ($app, \PDO $pdo, Twig $twig, \App\Support\ClerkAuth $clerkAuth)
 
     $app->group('/tacta', function ($group) use ($tactaCtrl) {
         $group->get('', [$tactaCtrl, 'page']);
+        $group->get('/api/deck', [$tactaCtrl, 'deck']);
         $group->post('/api/games', [$tactaCtrl, 'create']);
         $group->post('/api/games/{code}/join', [$tactaCtrl, 'join']);
         $group->get('/api/games/{code}/state', [$tactaCtrl, 'state']);
