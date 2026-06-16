@@ -96,39 +96,17 @@ final class MoveValidatorTest extends TestCase
 
     public function test_allows_isolated_drop_when_no_connect_is_possible(): void
     {
-        // Build a board whose only card is a starting card with all-Square edges, and give the
-        // player a deck whose top card has NO square edges -> cannot connect anywhere.
-        $board = BoardBuilder::build([]);
-        // Find a layout with no Square edge to use as the top card.
-        $deckOrder = null;
-        foreach (Deck::forColor('red') as $i => $card) {
-            $hasSquare = false;
-            foreach ([Side::N, Side::E, Side::S, Side::W] as $s) {
-                if ($card->edge($s)->shape === \App\Tacta\Shape::Square) {
-                    $hasSquare = true;
-                    break;
-                }
-            }
-            if (!$hasSquare) {
-                $deckOrder = array_merge([$i], array_values(array_diff(range(0, 17), [$i])));
-                break;
-            }
-        }
-        // The starting card (Deck::startingCard) has edges T/Q/R/Q. If the top card has no
-        // Square AND can still match Triangle/Rectangle, a connect might exist; so additionally
-        // require this test only runs when legalConnects is genuinely empty.
-        if ($deckOrder === null) {
-            $this->markTestSkipped('no layout exists without a Square edge in this deck');
-        }
-        $top = Deck::forColor('red')[$deckOrder[0]];
-        if (!empty(Rules::legalConnects($board, $top, 'red', $board->nextZ()))) {
-            $this->markTestSkipped('chosen top card can still connect to the starting card');
-        }
+        // An empty board (no cards) has nothing to connect to, so the isolated-drop branch
+        // (anyConnectPossible == false, then isLegalIsolated) must accept the placement.
+        // This exercises the acceptance path directly, independent of deck composition.
+        $board = new Board();
+        $deck = range(0, 17);
 
-        $result = MoveValidator::validate($board, 'red', $deckOrder, 0, 0, [
-            'draw_end' => 'top', 'x' => 9, 'y' => 9, 'rotation' => 0, 'mirror' => false,
+        $result = MoveValidator::validate($board, 'red', $deck, 0, 0, [
+            'draw_end' => 'top', 'x' => 0, 'y' => 0, 'rotation' => 0, 'mirror' => false,
         ]);
-        $this->assertSame('red-' . ($deckOrder[0] + 1), $result['card_id']);
+
+        $this->assertSame('red-' . ($deck[0] + 1), $result['card_id']);
     }
 
     public function test_no_cards_left_throws(): void
