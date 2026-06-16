@@ -118,4 +118,26 @@ final class MoveValidatorTest extends TestCase
             'draw_end' => 'top', 'x' => 0, 'y' => -1, 'rotation' => 0, 'mirror' => false,
         ]);
     }
+
+    public function test_one_card_left_forces_top_draw(): void
+    {
+        $board = new Board(); // empty: isolated drop accepted, isolating the draw-end logic
+        $deck = range(0, 17);
+        // head = 8, tail = 17 - 9 = 8 -> a single card remains; 'bottom' must be forced to 'top'.
+        $result = MoveValidator::validate($board, 'red', $deck, 8, 9, [
+            'draw_end' => 'bottom', 'x' => 0, 'y' => 0, 'rotation' => 0, 'mirror' => false,
+        ]);
+
+        $this->assertSame('top', $result['draw_end']);
+        $this->assertSame('red-' . ($deck[8] + 1), $result['card_id']);
+    }
+
+    public function test_rejects_coordinates_out_of_range(): void
+    {
+        $board = new Board();
+        $this->expectException(ValidationException::class);
+        MoveValidator::validate($board, 'red', range(0, 17), 0, 0, [
+            'draw_end' => 'top', 'x' => 999999, 'y' => 0, 'rotation' => 0, 'mirror' => false,
+        ]);
+    }
 }

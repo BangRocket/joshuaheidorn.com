@@ -235,4 +235,16 @@ final class TactaApiTest extends TestCase
             ['tacta_' . $code => $currentToken]);
         $this->assertSame(400, $res->getStatusCode());
     }
+
+    public function test_move_without_identity_cookie_is_forbidden(): void
+    {
+        $app = $this->app();
+        [$code, $hostToken] = $this->twoPlayerLobby($app);
+        $this->post($app, "/tacta/api/games/{$code}/start", [], ['tacta_' . $code => $hostToken]);
+
+        // No cookie at all -> not a recognised player.
+        $res = $this->post($app, "/tacta/api/games/{$code}/moves",
+            ['draw_end' => 'top', 'x' => 0, 'y' => -1, 'rotation' => 0, 'mirror' => false]);
+        $this->assertSame(403, $res->getStatusCode());
+    }
 }

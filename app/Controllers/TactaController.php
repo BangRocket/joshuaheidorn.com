@@ -51,7 +51,7 @@ final class TactaController
             return $this->json($response, ['error' => $e->getMessage()], 400);
         }
 
-        $response = $this->setTokenCookie($response, $args['code'], $player['guest_token']);
+        $response = $this->setTokenCookie($request, $response, $args['code'], $player['guest_token']);
 
         return $this->json($response, [
             'seat' => $player['seat'],
@@ -246,13 +246,27 @@ final class TactaController
         ];
     }
 
-    private function setTokenCookie(Response $response, string $code, string $token): Response
+    private function setTokenCookie(Request $request, Response $response, string $code, string $token): Response
     {
-        $cookie = sprintf('tacta_%s=%s; Path=/tacta; HttpOnly; SameSite=Lax', $code, $token);
+        // Add `; Secure` when the request reached us over HTTPS — directly or via the
+        // Cloudflare `X-Forwarded-Proto` header — but not on plain-HTTP local dev.
+        $https = $request->getHeaderLine('X-Forwarded-Proto') === 'https'
+            || $request->getUri()->getScheme() === 'https';
+        $cookie = sprintf(
+            'tacta_%s=%s; Path=/tacta; HttpOnly; SameSite=Lax%s',
+            $code,
+            $token,
+            $https ? '; Secure' : '',
+        );
 
         return $response->withAddedHeader('Set-Cookie', $cookie);
     }
 
+    /**
+     * State-changing endpoints must carry an `application/json` body. Requiring JSON
+     * (a non-"simple" content type) forces a cross-origin preflight which, together with
+     * the SameSite=Lax identity cookie, keeps these mutations CSRF-resistant.
+     */
     private function requireJson(Request $request, Response $response): ?Response
     {
         if (!str_contains($request->getHeaderLine('Content-Type'), 'application/json')) {

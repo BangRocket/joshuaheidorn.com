@@ -15,6 +15,11 @@ final class MoveValidator
 {
     private const SIDES = [Side::N, Side::E, Side::S, Side::W];
 
+    // Coordinate sanity bound. Real boards never exceed a few hundred cells from
+    // origin (108 cards max), so this only rejects abusive values that would
+    // otherwise overflow MySQL's INT column on insert.
+    private const MAX_COORD = 1000;
+
     /**
      * @param list<int> $deck shuffled layout indices (0..17)
      * @param array{draw_end:string,x:int,y:int,rotation:int,mirror:bool} $move
@@ -50,6 +55,9 @@ final class MoveValidator
         $mirror = !empty($move['mirror']);
         if ($rotation < 0 || $rotation > 3) {
             throw new ValidationException('Invalid rotation.');
+        }
+        if (abs($x) > self::MAX_COORD || abs($y) > self::MAX_COORD) {
+            throw new ValidationException('Coordinates out of range.');
         }
         if ($board->cardAt($x, $y) !== null) {
             throw new ValidationException('That cell is already occupied.');
