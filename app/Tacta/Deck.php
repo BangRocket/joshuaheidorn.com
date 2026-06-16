@@ -8,6 +8,9 @@ final class Deck
 {
     // 18 layouts. Each row: [N, E, S, W] where each edge is [Shape, dots], plus a Suit.
     // Balanced first cut; all six color decks share these layouts.
+    // NOTE: every layout currently carries all three edge-shape types, so a legal connecting
+    // move always exists — the "no legal move -> isolated drop" rule (Rules::isLegalIsolated,
+    // exercised by tests) is intentionally unreachable in real play until these decks are tuned.
     private const T = Shape::Triangle;
     private const Q = Shape::Square;
     private const R = Shape::Rectangle;
